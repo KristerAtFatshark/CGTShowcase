@@ -17,6 +17,14 @@ const DIST_DIR = path.join(__dirname, 'dist', 'CGTShowcase', 'browser');
 const AUTH_CONFIG_PATH = path.join(__dirname, 'jira-auth.json');
 const TEAMCITY_AUTH_CONFIG_PATH = path.join(__dirname, 'teamcity-auth.json');
 
+function readDistributedLatestMainFile(filePath) {
+  if (!filePath) {
+    throw new Error('Missing distributed latest main path');
+  }
+
+  return fs.readFileSync(filePath, 'utf8');
+}
+
 function loadJiraAuthConfig() {
   if (fs.existsSync(AUTH_CONFIG_PATH)) {
     return JSON.parse(fs.readFileSync(AUTH_CONFIG_PATH, 'utf8'));
@@ -173,6 +181,28 @@ function proxyTeamCityRequest(req, res) {
   req.pipe(proxyReq, { end: true });
 }
 
+function serveDistributedLatestMain(req, res) {
+  const parsedUrl = new url.URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  const filePath = parsedUrl.searchParams.get('path');
+
+  try {
+    const contents = readDistributedLatestMainFile(filePath);
+    res.writeHead(200, {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Access-Control-Allow-Origin': '*',
+    });
+    res.end(contents);
+  } catch (err) {
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(
+      JSON.stringify({
+        error: 'Failed to read distributed latest main file',
+        message: err.message,
+      }),
+    );
+  }
+}
+
 const server = http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url);
 
@@ -184,6 +214,11 @@ const server = http.createServer((req, res) => {
 
   if (parsedUrl.pathname.startsWith('/teamcity-api')) {
     proxyTeamCityRequest(req, res);
+    return;
+  }
+
+  if (parsedUrl.pathname === '/app-api/distributed-latest-main') {
+    serveDistributedLatestMain(req, res);
     return;
   }
 

@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { catchError, forkJoin, of, switchMap } from 'rxjs';
 import { TopBarComponent } from './components/top-bar/top-bar.component';
 import { JiraPanelComponent } from './components/jira-panel/jira-panel.component';
 import { BottomBarComponent } from './components/bottom-bar/bottom-bar.component';
@@ -7,6 +8,10 @@ import { SettingsService } from './services/settings.service';
 import { UserSettings } from './models/user-settings.model';
 import { TeamCityBuild } from './models/teamcity.models';
 import { TeamCityService } from './services/teamcity.service';
+import { DistributedLatestMainService } from './services/distributed-latest-main.service';
+
+const DISTRIBUTED_MAIN_BUILD_TYPE_ID =
+  'Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite';
 
 @Component({
   selector: 'app-root',
@@ -33,6 +38,7 @@ export class App implements OnInit {
   constructor(
     private settingsService: SettingsService,
     private teamCityService: TeamCityService,
+    private distributedLatestMainService: DistributedLatestMainService,
   ) {}
 
   ngOnInit(): void {
@@ -41,7 +47,7 @@ export class App implements OnInit {
       next: (settings) => {
         this.settings.set(settings);
         this.pendingInitialPanelLoads.set(2);
-        this.loadTeamCityBuilds(settings.teamCityBuildTypeIds);
+        this.loadTeamCityBuilds(settings);
         this.loaded.set(true);
       },
       error: (err) => {
@@ -63,14 +69,39 @@ export class App implements OnInit {
   onRefresh(): void {
     this.leftPanel?.loadIssues();
     this.rightPanel?.loadIssues();
-    const buildTypeIds = this.settings()?.teamCityBuildTypeIds ?? [];
-    this.loadTeamCityBuilds(buildTypeIds);
+    this.loadTeamCityBuilds(this.settings());
   }
 
-  private loadTeamCityBuilds(buildTypeIds: string[]): void {
-    this.teamCityService.getLatestBuildStatuses(buildTypeIds).subscribe({
-      next: (builds) => {
-        this.teamCityBuilds.set(builds);
+  private loadTeamCityBuilds(settings: UserSettings | null): void {
+    const buildTypeIds = settings?.teamCityBuildTypeIds ?? [];
+    const latestBuilds$ = this.teamCityService.getLatestBuildStatuses(buildTypeIds);
+    const matchingDistributedBuild$ = settings?.distributedLatestMain
+      ? this.distributedLatestMainService.getEngineRevision(settings.distributedLatestMain).pipe(
+          switchMap((engineRevision) =>
+            engineRevision
+              ? this.teamCityService.getBuildByRevision(
+                  DISTRIBUTED_MAIN_BUILD_TYPE_ID,
+                  engineRevision,
+                )
+              : of(null),
+          ),
+          catchError((err) => {
+            console.error('Failed to load distributed latest main build:', err);
+            return of(null);
+          }),
+        )
+      : of(null);
+
+    forkJoin({
+      latestBuilds: latestBuilds$,
+      matchingDistributedBuild: matchingDistributedBuild$,
+    }).subscribe({
+      next: ({ latestBuilds, matchingDistributedBuild }) => {
+        this.teamCityBuilds.set(
+          matchingDistributedBuild
+            ? [...latestBuilds, { ...matchingDistributedBuild, label: 'Distributed Latest Main' }]
+            : latestBuilds,
+        );
       },
       error: (err) => {
         console.error('Failed to load TeamCity builds:', err);

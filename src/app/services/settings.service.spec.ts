@@ -37,6 +37,7 @@ describe('SettingsService', () => {
       textSizeMultiplier: 1.25,
       leftPanelWidth: '45%',
       bottomBarHeight: '72px',
+      distributedLatestMain: '\\\\filegw02\\vault\\stingray-binaries\\main\\latest\\build_info.txt',
       teamCityBuildTypeIds: ['Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite'],
     };
 
@@ -60,6 +61,7 @@ describe('SettingsService', () => {
       textSizeMultiplier: 0.9,
       leftPanelWidth: '40%',
       bottomBarHeight: '80px',
+      distributedLatestMain: '\\\\filegw02\\vault\\stingray-binaries\\main\\latest\\build_info.txt',
       teamCityBuildTypeIds: ['BuildA', 'BuildB'],
     };
 

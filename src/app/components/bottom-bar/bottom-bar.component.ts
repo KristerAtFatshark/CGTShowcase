@@ -22,6 +22,10 @@ export class BottomBarComponent {
     hour12: false,
   });
 
+  trackBuild(index: number, build: TeamCityBuild): string {
+    return `${build.id}:${build.label ?? 'default'}:${index}`;
+  }
+
   formatBranchName(branchName?: string): string {
     return branchName || 'Unknown branch';
   }

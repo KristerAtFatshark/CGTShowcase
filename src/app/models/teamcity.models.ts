@@ -7,6 +7,7 @@ export interface TeamCityBuild {
   buildTypeId: string;
   branchName?: string;
   defaultBranch?: boolean;
+  label?: string;
 }
 
 export interface TeamCityBuildResponse {

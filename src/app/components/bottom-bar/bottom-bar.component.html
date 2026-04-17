@@ -3,16 +3,21 @@
     <span class="placeholder">TeamCity Build Status</span>
   } @else {
     <div class="build-list">
-      @for (build of builds; track build.id) {
+      @for (build of builds; track trackBuild($index, build)) {
         <div class="build-item">
           <div class="build-header">
             <span class="build-type">{{ build.buildTypeId }}</span>
-            <span
-              class="build-status"
-              [class.build-status-failed]="!isBuildSuccessful(build.status)"
-            >
-              {{ formatStatus(build.status) }}
-            </span>
+            <div class="build-header-right">
+              <span
+                class="build-status"
+                [class.build-status-failed]="!isBuildSuccessful(build.status)"
+              >
+                {{ formatStatus(build.status) }}
+              </span>
+              @if (build.label) {
+                <span class="build-label">{{ build.label }}</span>
+              }
+            </div>
           </div>
           <div class="build-details">
             <span>Number: {{ build.number }}</span>

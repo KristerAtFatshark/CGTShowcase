@@ -6,5 +6,6 @@ export interface UserSettings {
   textSizeMultiplier: number;
   leftPanelWidth: string;
   bottomBarHeight: string;
+  distributedLatestMain: string;
   teamCityBuildTypeIds: string[];
 }

@@ -4,6 +4,7 @@ import { HttpResponse } from '@angular/common/http';
 import { App } from './app';
 import { UserSettings } from './models/user-settings.model';
 import { SettingsService } from './services/settings.service';
+import { DistributedLatestMainService } from './services/distributed-latest-main.service';
 import { JiraService } from './services/jira.service';
 import { JiraSearchResponse } from './models/jira.models';
 import { TeamCityService } from './services/teamcity.service';
@@ -17,6 +18,7 @@ describe('App', () => {
     textSizeMultiplier: 1.25,
     leftPanelWidth: '45%',
     bottomBarHeight: '72px',
+    distributedLatestMain: '\\\\filegw02\\vault\\stingray-binaries\\main\\latest\\build_info.txt',
     teamCityBuildTypeIds: ['Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite'],
   };
 
@@ -63,12 +65,18 @@ describe('App', () => {
             branchName: 'main',
           },
         ]),
+      getBuildByRevision: () => of(null),
+    };
+
+    const mockDistributedLatestMainService = {
+      getEngineRevision: () => of(null),
     };
 
     TestBed.configureTestingModule({
       imports: [App],
       providers: [
         { provide: SettingsService, useValue: mockSettingsService },
+        { provide: DistributedLatestMainService, useValue: mockDistributedLatestMainService },
         { provide: JiraService, useValue: mockJiraService },
         { provide: TeamCityService, useValue: mockTeamCityService },
       ],
@@ -143,5 +151,140 @@ describe('App', () => {
     expect(bottomBar.textContent).toContain('ID: 123');
     expect(bottomBar.textContent).toContain('Finished: 2026-04-17 12:00:00 SWE');
     expect(bottomBar.textContent).toContain('Branch: main');
+  });
+
+  it('should append the distributed latest main TeamCity build when a revision matches', () => {
+    const matchingBuild = {
+      id: 714094,
+      number: '1323',
+      status: 'SUCCESS',
+      statusText: 'Build chain finished (success: 28)',
+      buildTypeId: 'Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite',
+      finishDate: '20260416T142642+0000',
+      branchName: 'main',
+      defaultBranch: true,
+    };
+
+    const mockSettingsService = {
+      loadSettings: () => of(mockSettings),
+      getSettings: () => mockSettings,
+      settings$: of(mockSettings),
+    };
+
+    const mockJiraService = {
+      getFilterResults: () =>
+        of(
+          new HttpResponse<JiraSearchResponse>({
+            body: { issues: [] },
+            status: 200,
+          }),
+        ),
+    };
+
+    const mockTeamCityService = {
+      getLatestBuildStatuses: () =>
+        of([
+          {
+            id: 123,
+            number: '456',
+            status: 'SUCCESS',
+            statusText: 'Success',
+            buildTypeId: 'Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite',
+            finishDate: '20260417T100000+0000',
+            branchName: 'main',
+          },
+        ]),
+      getBuildByRevision: () => of(matchingBuild),
+    };
+
+    const mockDistributedLatestMainService = {
+      getEngineRevision: () => of('664ad19cab4eaca1e8318ac9aa674322fc99ee16'),
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      imports: [App],
+      providers: [
+        { provide: SettingsService, useValue: mockSettingsService },
+        { provide: DistributedLatestMainService, useValue: mockDistributedLatestMainService },
+        { provide: JiraService, useValue: mockJiraService },
+        { provide: TeamCityService, useValue: mockTeamCityService },
+      ],
+    });
+
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+
+    const buildItems = fixture.nativeElement.querySelectorAll('.build-item');
+    expect(buildItems.length).toBe(2);
+    expect(buildItems[1].textContent).toContain('Number: 1323');
+    expect(buildItems[1].textContent).toContain('ID: 714094');
+    expect(buildItems[1].textContent).toContain('Finished: 2026-04-16 16:26:42 SWE');
+    expect(buildItems[1].textContent).toContain('Distributed Latest Main');
+  });
+
+  it('should refresh TeamCity bottom bar data when the refresh button is clicked', () => {
+    let latestBuildStatusesCalls = 0;
+    let engineRevisionCalls = 0;
+    let buildByRevisionCalls = 0;
+
+    const mockSettingsService = {
+      loadSettings: () => of(mockSettings),
+      getSettings: () => mockSettings,
+      settings$: of(mockSettings),
+    };
+
+    const mockJiraService = {
+      getFilterResults: () =>
+        of(
+          new HttpResponse<JiraSearchResponse>({
+            body: { issues: [] },
+            status: 200,
+          }),
+        ),
+    };
+
+    const mockTeamCityService = {
+      getLatestBuildStatuses: () => {
+        latestBuildStatusesCalls += 1;
+        return of([]);
+      },
+      getBuildByRevision: () => {
+        buildByRevisionCalls += 1;
+        return of(null);
+      },
+    };
+
+    const mockDistributedLatestMainService = {
+      getEngineRevision: () => {
+        engineRevisionCalls += 1;
+        return of('664ad19cab4eaca1e8318ac9aa674322fc99ee16');
+      },
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      imports: [App],
+      providers: [
+        { provide: SettingsService, useValue: mockSettingsService },
+        { provide: DistributedLatestMainService, useValue: mockDistributedLatestMainService },
+        { provide: JiraService, useValue: mockJiraService },
+        { provide: TeamCityService, useValue: mockTeamCityService },
+      ],
+    });
+
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+
+    expect(latestBuildStatusesCalls).toBe(1);
+    expect(engineRevisionCalls).toBe(1);
+    expect(buildByRevisionCalls).toBe(1);
+
+    fixture.nativeElement.querySelector('.refresh-btn').click();
+    fixture.detectChanges();
+
+    expect(latestBuildStatusesCalls).toBe(2);
+    expect(engineRevisionCalls).toBe(2);
+    expect(buildByRevisionCalls).toBe(2);
   });
 });

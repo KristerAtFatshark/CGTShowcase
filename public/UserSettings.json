@@ -6,5 +6,6 @@
   "textSizeMultiplier": 1,
   "leftPanelWidth": "50%",
   "bottomBarHeight": "80px",
+  "distributedLatestMain": "\\\\filegw02\\vault\\stingray-binaries\\main\\latest\\build_info.txt",
   "teamCityBuildTypeIds": ["Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite"]
 }

@@ -12,17 +12,30 @@ import {
   providedIn: 'root',
 })
 export class TeamCityService {
+  private readonly buildFields = encodeURIComponent(
+    'count,build(id,number,status,statusText,finishDate,finishOnAgentDate,buildTypeId,branchName,defaultBranch)',
+  );
+
   constructor(private http: HttpClient) {}
 
   getLatestBuildStatus(buildTypeId: string): Observable<TeamCityBuild | null> {
     const locator = encodeURIComponent('running:false,branch:main,count:1');
-    const fields = encodeURIComponent(
-      'count,build(id,number,status,statusText,finishDate,finishOnAgentDate,buildTypeId,branchName,defaultBranch)',
+
+    return this.http
+      .get<TeamCityBuildResponse>(
+        `/teamcity-api/app/rest/buildTypes/id:${encodeURIComponent(buildTypeId)}/builds/?locator=${locator}&fields=${this.buildFields}`,
+      )
+      .pipe(map((response) => this.mapLatestBuild(response.build?.[0])));
+  }
+
+  getBuildByRevision(buildTypeId: string, revision: string): Observable<TeamCityBuild | null> {
+    const locator = encodeURIComponent(
+      `buildType:(id:${buildTypeId}),branch:main,running:false,revision:(version:${revision}),count:1`,
     );
 
     return this.http
       .get<TeamCityBuildResponse>(
-        `/teamcity-api/app/rest/buildTypes/id:${encodeURIComponent(buildTypeId)}/builds/?locator=${locator}&fields=${fields}`,
+        `/teamcity-api/app/rest/builds/?locator=${locator}&fields=${this.buildFields}`,
       )
       .pipe(map((response) => this.mapLatestBuild(response.build?.[0])));
   }

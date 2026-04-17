@@ -51,6 +51,27 @@ describe('BottomBarComponent', () => {
     expect(item.textContent).toContain('Branch: main');
   });
 
+  it('should render the build label when present', () => {
+    const buildFixture = TestBed.createComponent(BottomBarComponent);
+    buildFixture.componentInstance.builds = [
+      {
+        id: 714094,
+        number: '1323',
+        status: 'SUCCESS',
+        statusText: 'Build chain finished (success: 28)',
+        buildTypeId: 'Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite',
+        finishDate: '20260416T142642+0000',
+        branchName: 'main',
+        label: 'Distributed Latest Main',
+      },
+    ];
+    buildFixture.detectChanges();
+
+    const label = buildFixture.nativeElement.querySelector('.build-label');
+    expect(label).toBeTruthy();
+    expect(label.textContent).toContain('Distributed Latest Main');
+  });
+
   it('should render non-successful builds as not successful', () => {
     const buildFixture = TestBed.createComponent(BottomBarComponent);
     buildFixture.componentInstance.builds = [

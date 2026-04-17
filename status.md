@@ -14,6 +14,7 @@
 - The text size multiplier is loaded from `UserSettings.json` and scales component-level text sizes directly.
 - The left Jira panel width is loaded from `UserSettings.json` as a CSS length string.
 - The bottom bar height is loaded from `UserSettings.json` as a CSS length string.
+- The `distributedLatestMain` path is loaded from `UserSettings.json` as a network file path string.
 - Left and right Jira panels load from configured filter IDs.
 - Panel headers show Jira filter name and filter ID.
 - Jira items show issue type icon, key, priority, and status in the top row.
@@ -21,7 +22,10 @@
 - Startup loading failures are shown in red under `Loading...`.
 - Bottom bar shows TeamCity build status items for configured build types.
 - TeamCity lookups now request the latest finished `main` branch build through the TeamCity `builds` locator API.
+- The app reads `distributedLatestMain`, parses `engine_revision` from the network JSON file, and appends a matched TeamCity build item when a `main` branch revision match is found.
+- The appended distributed-main TeamCity card is labeled `Distributed Latest Main` after status in the top row.
 - TeamCity build items show build type ID in the title row, success/failure text in the title row, and number, ID, finished time, and branch in the detail row.
+- Pressing the refresh button reloads both Jira panels and the full TeamCity bottom-bar data flow.
 - TeamCity finished time now uses `finishDate`, with fallback to `finishOnAgentDate` when TeamCity omits `finishDate`.
 - TeamCity finished time is displayed in Swedish local time using `Europe/Stockholm` timezone rules and the `SWE` suffix.
 
@@ -33,6 +37,7 @@
 - Text size multiplier: `1`
 - Left panel width: `50%`
 - Bottom bar height: `60px`
+- Distributed latest main path: `\\filegw02\vault\stingray-binaries\main\latest\build_info.txt`
 - TeamCity build type IDs: `Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite`
 
 ## Known Issues
@@ -42,6 +47,7 @@
 - TeamCity data depends on local `teamcity-auth.json` or TeamCity environment variables being present.
 - Browser-visible behavior can depend on the dev proxy being active when running locally.
 - TeamCity `builds` locator responses are collections, not single-build objects.
+- If the distributed latest main match resolves to the same TeamCity build as the latest main card, the bottom-bar tracking key must include the label so both cards render.
 
 ## Workarounds
 
@@ -64,6 +70,11 @@
 - Updated the TeamCity locator to return only the latest finished `main` branch build.
 - Updated the TeamCity bottom-bar item UI to show the requested build fields with formatted finish time and clearer success/failure text.
 - Added Jira priority field support and render priority icon/text before status in Jira item top rows.
+- Renamed the runtime network path setting to `distributedLatestMain` and pointed it to the latest main build info file.
+- Added a distributed latest main file reader/parser and a TeamCity revision-match lookup that appends a second bottom-bar build item when found.
+- Moved the `Distributed Latest Main` label into the top row after status to keep the card more compact.
+- Added explicit test coverage proving the refresh button reloads TeamCity bottom-bar data, including the distributed latest main lookup.
+- Fixed bottom-bar card tracking so the latest main card and the labeled distributed-main match can both render even when they share the same TeamCity build ID.
 - Adjusted the TeamCity bottom-bar detail row to remove duplicate build type/status text and show branch next to ID and finished time.
 - Added TeamCity build `number` to the detail row before `ID`.
 - Updated the TeamCity request fields so build completion time is returned consistently for the bottom bar.
@@ -87,5 +98,6 @@
 - Verified the TeamCity completion-time fallback with a live `localhost:4201/teamcity-api/...fields=...finishDate,finishOnAgentDate...` request plus `npm.cmd test -- --watch=false` and `npm.cmd run build`.
 - Verified the Swedish TeamCity time formatting with `npm.cmd test -- --watch=false` and `npm.cmd run build`.
 - Verified the `main` branch TeamCity filter with a live `localhost:4201/teamcity-api/...locator=running:false,branch:main,count:1...` request plus `npm.cmd test -- --watch=false` and `npm.cmd run build`.
+- Verified the distributed latest main revision flow against the real network file and TeamCity revision locator, then re-ran `npm.cmd test -- --watch=false` and `npm.cmd run build`.
 - Verified the merged dev proxy with live `localhost:4201/jira-api/...` and `localhost:4201/teamcity-api/...` requests plus `npm.cmd test -- --watch=false` and `npm.cmd run build`.
 - Verified the new layout settings with `npm.cmd test -- --watch=false` and `npm.cmd run build`.
