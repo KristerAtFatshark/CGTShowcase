@@ -1,0 +1,76 @@
+.jira-item {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #444;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  background-color: #1e1e1e;
+  overflow: hidden;
+}
+
+.row {
+  padding: 8px 12px;
+  box-sizing: border-box;
+}
+
+.row-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  background-color: #2a2a2a;
+  border-bottom: 1px solid #444;
+}
+
+.issue-type-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.key {
+  font-weight: bold;
+  color: #4a90d9;
+  font-size: 14px;
+}
+
+.status {
+  color: #8bc34a;
+  font-size: 13px;
+  margin-left: auto;
+}
+
+.row-summary {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #333;
+}
+
+.summary {
+  font-size: 14px;
+  color: #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row-description {
+  height: 120px;
+  padding: 8px 12px;
+}
+
+.description-box {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
+  font-size: 13px;
+  color: #bbb;
+  line-height: 1.4;
+}
+
+.description-content {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}

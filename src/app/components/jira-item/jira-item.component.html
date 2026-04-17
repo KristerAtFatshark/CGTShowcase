@@ -1,0 +1,20 @@
+<div class="jira-item">
+  <div class="row row-info">
+    <img
+      class="issue-type-icon"
+      [src]="issueTypeIconUrl"
+      [alt]="issueTypeName"
+      [title]="issueTypeName"
+    />
+    <span class="key">{{ issue.key }}</span>
+    <span class="status">{{ statusName }}</span>
+  </div>
+  <div class="row row-summary">
+    <span class="summary">{{ issue.fields.summary }}</span>
+  </div>
+  <div class="row row-description">
+    <div #descriptionViewport class="description-box">
+      <div #descriptionContent class="description-content">{{ description }}</div>
+    </div>
+  </div>
+</div>

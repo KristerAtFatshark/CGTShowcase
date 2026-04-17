@@ -1,0 +1,19 @@
+<div class="jira-panel">
+  <div class="panel-header">
+    <span class="panel-title">{{ filterName() }}</span>
+    <span class="panel-filter-id">({{ filterId }})</span>
+  </div>
+  <div class="panel-content">
+    <div class="loading" [hidden]="!loading()">Loading...</div>
+    <div class="error" [hidden]="!error()">{{ error() }}</div>
+    <div class="empty" [hidden]="loading() || !!error() || issues().length > 0">
+      No issues found.
+    </div>
+    @for (issue of issues(); track issue.key) {
+      <app-jira-item
+        [issue]="issue"
+        [autoScrollPixelsPerSecond]="descriptionAutoScrollPixelsPerSecond"
+      ></app-jira-item>
+    }
+  </div>
+</div>

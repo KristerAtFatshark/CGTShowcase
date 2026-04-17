@@ -1,0 +1,5 @@
+{
+  "jiraBase": "https://fatshark.atlassian.net",
+  "jiraEmail": "krister.larsson@fatshark.se",
+  "jiraToken": "replace-with-your-token"
+}

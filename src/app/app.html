@@ -1,0 +1,53 @@
+@if (!loaded()) {
+  <div class="loading-screen">
+    <div class="loading-content">
+      <div>Loading...</div>
+      @for (error of startupErrors(); track error) {
+        <div class="loading-error">{{ error }}</div>
+      }
+    </div>
+  </div>
+} @else if (!settings()) {
+  <div class="loading-screen">
+    <div class="loading-content">
+      <div>Loading...</div>
+      @for (error of startupErrors(); track error) {
+        <div class="loading-error">{{ error }}</div>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="app-layout" [class.no-debug-bar]="!settings()!.showDebugBar">
+    <app-top-bar [hidden]="!settings()!.showDebugBar" (refresh)="onRefresh()"></app-top-bar>
+    <div class="main-content">
+      <div class="panel left-panel">
+        <app-jira-panel
+          #leftPanel
+          [filterId]="settings()!.leftPanelFilterId"
+          [descriptionAutoScrollPixelsPerSecond]="settings()!.descriptionAutoScrollPixelsPerSecond"
+          (initialLoadResolved)="onInitialPanelLoadResolved($event)"
+        ></app-jira-panel>
+      </div>
+      <div class="panel right-panel">
+        <app-jira-panel
+          #rightPanel
+          [filterId]="settings()!.rightPanelFilterId"
+          [descriptionAutoScrollPixelsPerSecond]="settings()!.descriptionAutoScrollPixelsPerSecond"
+          (initialLoadResolved)="onInitialPanelLoadResolved($event)"
+        ></app-jira-panel>
+      </div>
+    </div>
+    <app-bottom-bar></app-bottom-bar>
+  </div>
+
+  @if (showStartupOverlay()) {
+    <div class="loading-screen loading-overlay">
+      <div class="loading-content">
+        <div>Loading...</div>
+        @for (error of startupErrors(); track error) {
+          <div class="loading-error">{{ error }}</div>
+        }
+      </div>
+    </div>
+  }
+}

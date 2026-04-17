@@ -1,0 +1,10 @@
+{
+  "/jira-api": {
+    "target": "https://fatshark.atlassian.net/rest/api/3",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/jira-api": ""
+    }
+  }
+}

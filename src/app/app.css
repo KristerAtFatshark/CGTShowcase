@@ -1,0 +1,65 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100vh;
+}
+
+.loading-screen,
+.error-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: #888;
+  font-size: 18px;
+  background-color: #1a1a1a;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 960px;
+  padding: 24px;
+  text-align: center;
+}
+
+.loading-error {
+  color: #ff6b6b;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background-color: rgba(26, 26, 26, 0.96);
+}
+
+.error-screen {
+  color: #e57373;
+}
+
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.panel {
+  flex: 1;
+  overflow: hidden;
+}
+
+.left-panel {
+  border-right: 1px solid #444;
+}
