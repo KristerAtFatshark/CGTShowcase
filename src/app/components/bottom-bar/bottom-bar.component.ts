@@ -12,6 +12,10 @@ import { TeamCityBuild } from '../../models/teamcity.models';
 export class BottomBarComponent {
   @Input() builds: TeamCityBuild[] = [];
 
+  formatBranchName(branchName?: string): string {
+    return branchName || 'Unknown branch';
+  }
+
   isBuildSuccessful(status: string): boolean {
     return status === 'SUCCESS';
   }

@@ -33,6 +33,7 @@ describe('BottomBarComponent', () => {
       statusText: 'Success',
       buildTypeId: 'Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite',
       finishDate: '20260417T100000+0000',
+      branchName: 'main',
     };
 
     const buildFixture = TestBed.createComponent(BottomBarComponent);
@@ -45,11 +46,8 @@ describe('BottomBarComponent', () => {
       'Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite',
     );
     expect(item.textContent).toContain('ID: 123');
-    expect(item.textContent).toContain(
-      'Build Type ID: Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite',
-    );
-    expect(item.textContent).toContain('Status: Success');
     expect(item.textContent).toContain('Finished: 2026-04-17 10:00:00 UTC+00:00');
+    expect(item.textContent).toContain('Branch: main');
   });
 
   it('should render non-successful builds as not successful', () => {
@@ -62,6 +60,7 @@ describe('BottomBarComponent', () => {
         statusText: 'Failure',
         buildTypeId: 'BuildB',
         finishDate: '20260417T120500+0200',
+        branchName: 'release/test',
       },
     ];
     buildFixture.detectChanges();
@@ -69,5 +68,24 @@ describe('BottomBarComponent', () => {
     const status = buildFixture.nativeElement.querySelector('.build-status');
     expect(status.textContent).toContain('Not successful');
     expect(status.classList).toContain('build-status-failed');
+  });
+
+  it('should show unknown branch when TeamCity omits branch name', () => {
+    const buildFixture = TestBed.createComponent(BottomBarComponent);
+    buildFixture.componentInstance.builds = [
+      {
+        id: 125,
+        number: '790',
+        status: 'SUCCESS',
+        statusText: 'Success',
+        buildTypeId: 'BuildC',
+        finishDate: '20260417T120500+0200',
+      },
+    ];
+    buildFixture.detectChanges();
+
+    expect(buildFixture.nativeElement.querySelector('.build-item').textContent).toContain(
+      'Branch: Unknown branch',
+    );
   });
 });

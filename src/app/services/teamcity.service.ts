@@ -18,10 +18,13 @@ export class TeamCityService {
     const locator = encodeURIComponent(
       'running:false,defaultFilter:false,branch:default:any,count:1',
     );
+    const fields = encodeURIComponent(
+      'count,build(id,number,status,statusText,finishDate,finishOnAgentDate,buildTypeId,branchName,defaultBranch)',
+    );
 
     return this.http
       .get<TeamCityBuildResponse>(
-        `/teamcity-api/app/rest/buildTypes/id:${encodeURIComponent(buildTypeId)}/builds/?locator=${locator}`,
+        `/teamcity-api/app/rest/buildTypes/id:${encodeURIComponent(buildTypeId)}/builds/?locator=${locator}&fields=${fields}`,
       )
       .pipe(map((response) => this.mapLatestBuild(response.build?.[0])));
   }
@@ -46,7 +49,7 @@ export class TeamCityService {
       number: build.number,
       status: build.status,
       statusText: build.statusText,
-      finishDate: build.finishDate,
+      finishDate: build.finishDate ?? build.finishOnAgentDate,
       buildTypeId: build.buildTypeId,
       branchName: build.branchName,
       defaultBranch: build.defaultBranch,

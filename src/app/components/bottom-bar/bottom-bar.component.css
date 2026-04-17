@@ -52,8 +52,9 @@
 }
 
 .build-details {
-  display: grid;
-  gap: 4px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
   color: #bdbdbd;
   font-size: calc(12px * var(--text-scale, 1));
 }

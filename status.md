@@ -21,7 +21,8 @@
 - Startup loading failures are shown in red under `Loading...`.
 - Bottom bar shows TeamCity build status items for configured build types.
 - TeamCity lookups now request the latest finished default-branch build through the TeamCity `builds` locator API.
-- TeamCity build items show ID, build type ID, success/failure text, and finished time.
+- TeamCity build items show build type ID in the title row, success/failure text in the title row, and ID, finished time, and branch in the detail row.
+- TeamCity finished time now uses `finishDate`, with fallback to `finishOnAgentDate` when TeamCity omits `finishDate`.
 
 ## Current Settings
 
@@ -59,6 +60,8 @@
 - Added TeamCity auth support, TeamCity settings, and bottom-bar TeamCity build status rendering.
 - Fixed TeamCity locator handling to read the `builds` collection response and keep only the latest finished default-branch build.
 - Updated the TeamCity bottom-bar item UI to show the requested build fields with formatted finish time and clearer success/failure text.
+- Adjusted the TeamCity bottom-bar detail row to remove duplicate build type/status text and show branch next to ID and finished time.
+- Updated the TeamCity request fields so build completion time is returned consistently for the bottom bar.
 - Merged the Angular dev proxy setup into `proxy.conf.js` so Jira and TeamCity both work from one config with route-specific auth.
 - Added runtime layout settings for left panel width and bottom bar height in `UserSettings.json`.
 - Restored Jira auth in the dev proxy after the TeamCity proxy update removed it.
@@ -73,5 +76,7 @@
 - Scrollbars were restyled to match the dark UI.
 - Verified the current TeamCity service change with `npm.cmd test -- --watch=false` and `npm.cmd run build`.
 - Verified the TeamCity bottom-bar UI change with `npm.cmd test -- --watch=false` and `npm.cmd run build`.
+- Verified the revised TeamCity build item layout with `npm.cmd test -- --watch=false` and `npm.cmd run build`.
+- Verified the TeamCity completion-time fallback with a live `localhost:4201/teamcity-api/...fields=...finishDate,finishOnAgentDate...` request plus `npm.cmd test -- --watch=false` and `npm.cmd run build`.
 - Verified the merged dev proxy with live `localhost:4201/jira-api/...` and `localhost:4201/teamcity-api/...` requests plus `npm.cmd test -- --watch=false` and `npm.cmd run build`.
 - Verified the new layout settings with `npm.cmd test -- --watch=false` and `npm.cmd run build`.

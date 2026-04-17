@@ -10,7 +10,7 @@ export interface TeamCityBuild {
 }
 
 export interface TeamCityBuildResponse {
-  build?: TeamCityBuild[];
+  build?: TeamCityBuildDetails[];
   count?: number;
 }
 
@@ -20,6 +20,7 @@ export interface TeamCityBuildDetails {
   status: string;
   statusText: string;
   finishDate?: string;
+  finishOnAgentDate?: string;
   buildTypeId: string;
   branchName?: string;
   defaultBranch?: boolean;

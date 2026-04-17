@@ -16,9 +16,8 @@
           </div>
           <div class="build-details">
             <span>ID: {{ build.id }}</span>
-            <span>Build Type ID: {{ build.buildTypeId }}</span>
-            <span>Status: {{ formatStatus(build.status) }}</span>
             <span>Finished: {{ formatFinishDate(build.finishDate) }}</span>
+            <span>Branch: {{ formatBranchName(build.branchName) }}</span>
           </div>
         </div>
       }
