@@ -1,0 +1,4 @@
+{
+  "teamCityBase": "http://teamcity.i.fatshark.se:8111",
+  "teamCityBearerToken": "replace-with-your-token"
+}

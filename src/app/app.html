@@ -41,7 +41,7 @@
         ></app-jira-panel>
       </div>
     </div>
-    <app-bottom-bar></app-bottom-bar>
+    <app-bottom-bar [builds]="teamCityBuilds()"></app-bottom-bar>
   </div>
 
   @if (showStartupOverlay()) {

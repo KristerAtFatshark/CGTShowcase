@@ -51,4 +51,5 @@ Thumbs.db
 .env
 *.local
 jira-auth.json
+teamcity-auth.json
 *.bak

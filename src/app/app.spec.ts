@@ -6,6 +6,7 @@ import { UserSettings } from './models/user-settings.model';
 import { SettingsService } from './services/settings.service';
 import { JiraService } from './services/jira.service';
 import { JiraSearchResponse } from './models/jira.models';
+import { TeamCityService } from './services/teamcity.service';
 
 describe('App', () => {
   const mockSettings: UserSettings = {
@@ -14,6 +15,7 @@ describe('App', () => {
     rightPanelFilterId: '18047',
     descriptionAutoScrollPixelsPerSecond: 12.5,
     textSizeMultiplier: 1.25,
+    teamCityBuildTypeIds: ['Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite'],
   };
 
   function setup(
@@ -46,11 +48,26 @@ describe('App', () => {
       },
     };
 
+    const mockTeamCityService = {
+      getLatestBuildStatuses: () =>
+        of([
+          {
+            id: 123,
+            number: '456',
+            status: 'SUCCESS',
+            statusText: 'Success',
+            buildTypeId: 'Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite',
+            finishDate: '20260417T100000+0000',
+          },
+        ]),
+    };
+
     TestBed.configureTestingModule({
       imports: [App],
       providers: [
         { provide: SettingsService, useValue: mockSettingsService },
         { provide: JiraService, useValue: mockJiraService },
+        { provide: TeamCityService, useValue: mockTeamCityService },
       ],
     });
 
@@ -104,5 +121,15 @@ describe('App', () => {
     expect(loadingErrors.length).toBe(2);
     expect(loadingErrors[0].textContent).toContain('[18046] Failed to load issues: Filter missing');
     expect(loadingErrors[1].textContent).toContain('[18047] Failed to load issues: Filter missing');
+  });
+
+  it('should render TeamCity builds in the bottom bar', () => {
+    const fixture = setup();
+    const bottomBar = fixture.nativeElement.querySelector('app-bottom-bar');
+    expect(bottomBar.textContent).toContain(
+      'Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite',
+    );
+    expect(bottomBar.textContent).toContain('Status: Success');
+    expect(bottomBar.textContent).toContain('ID: 123');
   });
 });

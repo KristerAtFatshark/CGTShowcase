@@ -2,7 +2,7 @@
 
 ## Overview
 
-CGTShowcase is an Angular 21 standalone TypeScript application intended for Windows TV/browser display use. It loads Jira issues from two configured Jira filters, renders them in two scrollable columns, and reserves a bottom area for future Jenkins integration.
+CGTShowcase is an Angular 21 standalone TypeScript application intended for Windows TV/browser display use. It loads Jira issues from two configured Jira filters, renders them in two scrollable columns, and shows TeamCity build statuses in the bottom bar.
 
 This document describes the current implemented application.
 
@@ -36,6 +36,15 @@ This document describes the current implemented application.
   - `JIRA_EMAIL` and `JIRA_TOKEN` environment variables
 - `jira-auth.example.json` is the tracked template
 
+### TeamCity Auth
+
+- Browser code calls `/teamcity-api/*`
+- TeamCity credentials are not committed
+- Production auth comes from either:
+  - local ignored `teamcity-auth.json`
+  - `TEAMCITY_BEARER_TOKEN` and optional `TEAMCITY_BASE` environment variables
+- `teamcity-auth.example.json` is the tracked template
+
 ## Current Project Structure
 
 ```text
@@ -54,9 +63,9 @@ CGTShowcase/
 │   │   │   ├── jira.models.ts
 │   │   │   └── user-settings.model.ts
 │   │   ├── services/
-│   │   │   ├── jenkins.service.ts
 │   │   │   ├── jira.service.ts
-│   │   │   └── settings.service.ts
+│   │   │   ├── settings.service.ts
+│   │   │   └── teamcity.service.ts
 │   │   ├── app.config.ts
 │   │   ├── app.css
 │   │   ├── app.html
@@ -70,6 +79,7 @@ CGTShowcase/
 ├── plan.md
 ├── proxy.conf.json
 ├── serve.js
+├── teamcity-auth.example.json
 └── status.md
 ```
 
@@ -85,7 +95,8 @@ Current shape:
   "leftPanelFilterId": "18046",
   "rightPanelFilterId": "18048",
   "descriptionAutoScrollPixelsPerSecond": 10,
-  "textSizeMultiplier": 1
+  "textSizeMultiplier": 1,
+  "teamCityBuildTypeIds": ["Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite"]
 }
 ```
 
@@ -96,6 +107,7 @@ Fields:
 - `rightPanelFilterId`: Jira filter for the right panel
 - `descriptionAutoScrollPixelsPerSecond`: description scroll speed in pixels per second
 - `textSizeMultiplier`: multiplies UI text sizes globally
+- `teamCityBuildTypeIds`: TeamCity build type IDs to show in the bottom bar
 
 ## Current Implemented Features
 
@@ -149,10 +161,17 @@ Used Jira data in the UI:
 - Implemented in the top bar
 - Reloads both Jira panels
 
-### Jenkins Stub
+### TeamCity Build Status
 
-- Implemented as a stub service
-- Bottom bar is currently a placeholder panel
+- Implemented in `teamcity.service.ts`
+- Bottom bar renders TeamCity build status cards for configured build type IDs
+- Current returned fields:
+  - `id`
+  - `number`
+  - `status`
+  - `statusText`
+  - `buildTypeId`
+  - `finishDate`
 
 ## Current UI Layout
 
@@ -171,7 +190,7 @@ Used Jira data in the UI:
 
 ### Bottom Bar (D)
 
-- Jenkins placeholder area
+- TeamCity build status area
 
 ## Current Panel Header Layout
 
@@ -336,7 +355,7 @@ The current application includes:
 - Jira issue type icons in item headers
 - configurable text scaling via user settings
 - configurable description auto-scroll speed
+- TeamCity build status integration in the bottom bar
 - startup error display under `Loading...`
 - dark themed UI with styled scrollbars
-- Jenkins placeholder panel
-- non-committed Jira auth for local/prod use
+- non-committed Jira and TeamCity auth for local/prod use

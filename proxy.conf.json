@@ -5,6 +5,9 @@
     "changeOrigin": true,
     "pathRewrite": {
       "^/jira-api": ""
+    },
+    "headers": {
+      "Authorization": "Basic a3Jpc3Rlci5sYXJzc29uQGZhdHNoYXJrLnNlOkFUQVRUM3hGZkdGMFFTYjJUZ09TUGNuelhhb2U1QkxaZENJRUJ3c2tjUlVFUjU1RmYtT0FIaFVWZXNTbXRwNlhieUFKR2tYYmtTcFNqSmQ5WGhjTHViQVg3aWJuS241M05odXdBOGNFT2xNVlNfaHhxM0FRbVBQZlhxRkhLY3dXcGk4SzdNLXZnenZBNWhDOHluNkw2UzhPVDZ3Z0U5OHFfMzdhTUF6MkVFWVpkdGhDdTBjcUV2Yz00NjQ2MzIxQg=="
     }
   }
 }

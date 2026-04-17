@@ -35,6 +35,7 @@ describe('SettingsService', () => {
       rightPanelFilterId: '18047',
       descriptionAutoScrollPixelsPerSecond: 12.5,
       textSizeMultiplier: 1.25,
+      teamCityBuildTypeIds: ['Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite'],
     };
 
     service.loadSettings().subscribe((settings) => {
@@ -55,6 +56,7 @@ describe('SettingsService', () => {
       rightPanelFilterId: '222',
       descriptionAutoScrollPixelsPerSecond: 8.5,
       textSizeMultiplier: 0.9,
+      teamCityBuildTypeIds: ['BuildA', 'BuildB'],
     };
 
     let emitted: UserSettings | undefined;

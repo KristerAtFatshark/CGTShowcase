@@ -1,0 +1,69 @@
+[33m>[39m Building...
+[32m√[39m Building...
+[1mInitial chunk files[22m[2m | [22m[1mNames[22m        [2m | [22m [1mRaw size[22m
+[32mmain.js[39m            [2m | [22m[2mmain[22m         [2m | [22m [36m55.04 kB[39m[2m | [22m
+[32mstyles.css[39m         [2m | [22m[2mstyles[22m       [2m | [22m[36m809 bytes[39m[2m | [22m
+
+[1m [22m                  [2m | [22m[1mInitial total[22m[2m | [22m [1m55.85 kB[22m
+
+Application bundle generation complete. [0.933 seconds] - 2026-04-17T10:34:31.860Z
+
+Watch mode enabled. Watching for file changes...
+NOTE: Raw file sizes do not reflect development server per-request transformations.
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m4201[22m/[39m
+[2m[32m  ➜[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m
+[1m[33mRequest for HTML file "/login.html" was received but no asset found. Asset may be missing from build.[39m[22m
+[1m[33mRequest for HTML file "/login.html" was received but no asset found. Asset may be missing from build.[39m[22m
+[1m[33mRequest for HTML file "/login.html" was received but no asset found. Asset may be missing from build.[39m[22m
+[33m>[39m Changes detected. Rebuilding...
+[32m√[39m Changes detected. Rebuilding...
+[1mInitial chunk files[22m[2m | [22m[1mNames[22m        [2m | [22m [1mRaw size[22m
+[32mmain.js[39m            [2m | [22m[2mmain[22m         [2m | [22m [36m55.04 kB[39m[2m | [22m
+[32mstyles.css[39m         [2m | [22m[2mstyles[22m       [2m | [22m[36m809 bytes[39m[2m | [22m
+
+[1m [22m                  [2m | [22m[1mInitial total[22m[2m | [22m [1m55.85 kB[22m
+
+Application bundle generation complete. [1.179 seconds] - 2026-04-17T10:41:36.860Z
+
+Page reload sent to client(s).
+[1m[33mRequest for HTML file "/login.html" was received but no asset found. Asset may be missing from build.[39m[22m
+[1m[33mRequest for HTML file "/login.html" was received but no asset found. Asset may be missing from build.[39m[22m
+[33m>[39m Changes detected. Rebuilding...
+[32m√[39m Changes detected. Rebuilding...
+[1mInitial chunk files[22m[2m | [22m[1mNames[22m[2m | [22m[1mRaw size[22m
+[32mmain.js[39m            [2m | [22m[2mmain[22m [2m | [22m[36m55.23 kB[39m[2m | [22m
+
+Application bundle generation complete. [0.302 seconds] - 2026-04-17T10:45:40.581Z
+
+Page reload sent to client(s).
+[1m[33mRequest for HTML file "/login.html" was received but no asset found. Asset may be missing from build.[39m[22m
+[33m>[39m Changes detected. Rebuilding...
+[32m√[39m Changes detected. Rebuilding...
+[1mInitial chunk files[22m[2m | [22m[1mNames[22m[2m | [22m[1mRaw size[22m
+[32mmain.js[39m            [2m | [22m[2mmain[22m [2m | [22m[36m55.34 kB[39m[2m | [22m
+
+Application bundle generation complete. [0.247 seconds] - 2026-04-17T10:48:09.697Z
+
+Page reload sent to client(s).
+[33m>[39m Changes detected. Rebuilding...
+[1m[33mRequest for HTML file "/login.html" was received but no asset found. Asset may be missing from build.[39m[22m
+[32m√[39m Changes detected. Rebuilding...
+[1mInitial chunk files[22m[2m | [22m[1mNames[22m        [2m | [22m [1mRaw size[22m
+[32mmain.js[39m            [2m | [22m[2mmain[22m         [2m | [22m [36m55.34 kB[39m[2m | [22m
+[32mstyles.css[39m         [2m | [22m[2mstyles[22m       [2m | [22m[36m809 bytes[39m[2m | [22m
+
+[1m [22m                  [2m | [22m[1mInitial total[22m[2m | [22m [1m56.14 kB[22m
+
+Application bundle generation complete. [0.212 seconds] - 2026-04-17T10:48:09.918Z
+
+[33m>[39m Changes detected. Rebuilding...
+[32m√[39m Changes detected. Rebuilding...
+[1mInitial chunk files[22m[2m | [22m[1mNames[22m[2m | [22m[1mRaw size[22m
+[32mmain.js[39m            [2m | [22m[2mmain[22m [2m | [22m[36m56.35 kB[39m[2m | [22m
+
+Application bundle generation complete. [0.502 seconds] - 2026-04-17T10:50:54.007Z
+
+Page reload sent to client(s).
+[1m[33mRequest for HTML file "/login.html" was received but no asset found. Asset may be missing from build.[39m[22m
+[1m[33mRequest for HTML file "/login.html" was received but no asset found. Asset may be missing from build.[39m[22m
+[1m[33mRequest for HTML file "/login.html" was received but no asset found. Asset may be missing from build.[39m[22m

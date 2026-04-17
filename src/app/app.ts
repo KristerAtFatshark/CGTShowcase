@@ -5,6 +5,8 @@ import { JiraPanelComponent } from './components/jira-panel/jira-panel.component
 import { BottomBarComponent } from './components/bottom-bar/bottom-bar.component';
 import { SettingsService } from './services/settings.service';
 import { UserSettings } from './models/user-settings.model';
+import { TeamCityBuild } from './models/teamcity.models';
+import { TeamCityService } from './services/teamcity.service';
 
 @Component({
   selector: 'app-root',
@@ -18,6 +20,7 @@ export class App implements OnInit {
   readonly loaded = signal(false);
   readonly startupErrors = signal<string[]>([]);
   readonly pendingInitialPanelLoads = signal(0);
+  readonly teamCityBuilds = signal<TeamCityBuild[]>([]);
   readonly showStartupOverlay = computed(
     () =>
       this.settings() !== null &&
@@ -27,7 +30,10 @@ export class App implements OnInit {
   @ViewChild('leftPanel') leftPanel!: JiraPanelComponent;
   @ViewChild('rightPanel') rightPanel!: JiraPanelComponent;
 
-  constructor(private settingsService: SettingsService) {}
+  constructor(
+    private settingsService: SettingsService,
+    private teamCityService: TeamCityService,
+  ) {}
 
   ngOnInit(): void {
     this.startupErrors.set([]);
@@ -35,6 +41,7 @@ export class App implements OnInit {
       next: (settings) => {
         this.settings.set(settings);
         this.pendingInitialPanelLoads.set(2);
+        this.loadTeamCityBuilds(settings.teamCityBuildTypeIds);
         this.loaded.set(true);
       },
       error: (err) => {
@@ -56,5 +63,18 @@ export class App implements OnInit {
   onRefresh(): void {
     this.leftPanel?.loadIssues();
     this.rightPanel?.loadIssues();
+    const buildTypeIds = this.settings()?.teamCityBuildTypeIds ?? [];
+    this.loadTeamCityBuilds(buildTypeIds);
+  }
+
+  private loadTeamCityBuilds(buildTypeIds: string[]): void {
+    this.teamCityService.getLatestBuildStatuses(buildTypeIds).subscribe({
+      next: (builds) => {
+        this.teamCityBuilds.set(builds);
+      },
+      error: (err) => {
+        console.error('Failed to load TeamCity builds:', err);
+      },
+    });
   }
 }
