@@ -2,5 +2,6 @@
   "showDebugBar": true,
   "leftPanelFilterId": "18046",
   "rightPanelFilterId": "18048",
-  "descriptionAutoScrollPixelsPerSecond": 10
+  "descriptionAutoScrollPixelsPerSecond": 10,
+  "textSizeMultiplier": 1
 }

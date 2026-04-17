@@ -34,6 +34,7 @@ describe('SettingsService', () => {
       leftPanelFilterId: '18046',
       rightPanelFilterId: '18047',
       descriptionAutoScrollPixelsPerSecond: 12.5,
+      textSizeMultiplier: 1.25,
     };
 
     service.loadSettings().subscribe((settings) => {
@@ -53,6 +54,7 @@ describe('SettingsService', () => {
       leftPanelFilterId: '111',
       rightPanelFilterId: '222',
       descriptionAutoScrollPixelsPerSecond: 8.5,
+      textSizeMultiplier: 0.9,
     };
 
     let emitted: UserSettings | undefined;

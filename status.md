@@ -10,6 +10,7 @@
 ## Current Behavior
 
 - Top debug bar can be hidden with `showDebugBar`.
+- The text size multiplier is loaded from `UserSettings.json` and scales component-level text sizes directly.
 - Left and right Jira panels load from configured filter IDs.
 - Panel headers show Jira filter name and filter ID.
 - Jira items show issue type icon, key, and status in the top row.
@@ -22,6 +23,7 @@
 - Left panel filter ID: `18046`
 - Right panel filter ID: `18048`
 - Description auto-scroll speed: `12.5` pixels/second
+- Text size multiplier: `1`
 
 ## Known Issues
 
@@ -38,6 +40,7 @@
 
 - Added `AGENTS.md` workflow rule file.
 - Added this `status.md` operational status file.
+- Moved text size scaling into `UserSettings.json` and removed the debug-bar control.
 - Panel headers now show bold filter names with non-bold filter IDs in parentheses.
 - Jira items now show issue type icons.
 - Replaced duration-based auto-scroll tuning with decimal `descriptionAutoScrollPixelsPerSecond` for consistent speed across all descriptions.

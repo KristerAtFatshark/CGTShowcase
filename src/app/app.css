@@ -11,7 +11,7 @@
   justify-content: center;
   height: 100vh;
   color: #888;
-  font-size: 18px;
+  font-size: calc(18px * var(--text-scale, 1));
   background-color: #1a1a1a;
 }
 
@@ -27,7 +27,7 @@
 
 .loading-error {
   color: #ff6b6b;
-  font-size: 16px;
+  font-size: calc(16px * var(--text-scale, 1));
   line-height: 1.4;
 }
 
@@ -43,6 +43,7 @@
 }
 
 .app-layout {
+  --text-scale: 1;
   display: flex;
   flex-direction: column;
   height: 100vh;

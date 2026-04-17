@@ -3,4 +3,5 @@ export interface UserSettings {
   leftPanelFilterId: string;
   rightPanelFilterId: string;
   descriptionAutoScrollPixelsPerSecond: number;
+  textSizeMultiplier: number;
 }

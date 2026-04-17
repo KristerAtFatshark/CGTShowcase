@@ -17,7 +17,11 @@
     </div>
   </div>
 } @else {
-  <div class="app-layout" [class.no-debug-bar]="!settings()!.showDebugBar">
+  <div
+    class="app-layout"
+    [class.no-debug-bar]="!settings()!.showDebugBar"
+    [style.--text-scale]="settings()!.textSizeMultiplier"
+  >
     <app-top-bar [hidden]="!settings()!.showDebugBar" (refresh)="onRefresh()"></app-top-bar>
     <div class="main-content">
       <div class="panel left-panel">

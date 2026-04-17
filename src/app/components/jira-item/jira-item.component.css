@@ -31,12 +31,12 @@
 .key {
   font-weight: bold;
   color: #4a90d9;
-  font-size: 14px;
+  font-size: calc(14px * var(--text-scale, 1));
 }
 
 .status {
   color: #8bc34a;
-  font-size: 13px;
+  font-size: calc(13px * var(--text-scale, 1));
   margin-left: auto;
 }
 
@@ -48,7 +48,7 @@
 }
 
 .summary {
-  font-size: 14px;
+  font-size: calc(14px * var(--text-scale, 1));
   color: #ddd;
   white-space: nowrap;
   overflow: hidden;
@@ -65,7 +65,7 @@
   height: 100%;
   overflow-y: auto;
   position: relative;
-  font-size: 13px;
+  font-size: calc(13px * var(--text-scale, 1));
   color: #bbb;
   line-height: 1.4;
 }

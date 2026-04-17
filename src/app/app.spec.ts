@@ -13,6 +13,7 @@ describe('App', () => {
     leftPanelFilterId: '18046',
     rightPanelFilterId: '18047',
     descriptionAutoScrollPixelsPerSecond: 12.5,
+    textSizeMultiplier: 1.25,
   };
 
   function setup(
@@ -88,6 +89,12 @@ describe('App', () => {
   it('should render both jira panels', () => {
     const fixture = setup();
     expect(fixture.nativeElement.querySelectorAll('app-jira-panel').length).toBe(2);
+  });
+
+  it('should apply text size multiplier from settings', () => {
+    const fixture = setup();
+    const layout = fixture.nativeElement.querySelector('.app-layout');
+    expect(layout.style.getPropertyValue('--text-scale')).toBe('1.25');
   });
 
   it('should show startup jira errors under loading text', () => {
