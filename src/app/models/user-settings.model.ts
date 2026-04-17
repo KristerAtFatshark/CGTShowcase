@@ -4,5 +4,7 @@ export interface UserSettings {
   rightPanelFilterId: string;
   descriptionAutoScrollPixelsPerSecond: number;
   textSizeMultiplier: number;
+  leftPanelWidth: string;
+  bottomBarHeight: string;
   teamCityBuildTypeIds: string[];
 }

@@ -4,5 +4,7 @@
   "rightPanelFilterId": "18048",
   "descriptionAutoScrollPixelsPerSecond": 10,
   "textSizeMultiplier": 1,
+  "leftPanelWidth": "50%",
+  "bottomBarHeight": "150px",
   "teamCityBuildTypeIds": ["Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite"]
 }

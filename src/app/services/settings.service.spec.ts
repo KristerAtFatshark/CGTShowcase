@@ -35,6 +35,8 @@ describe('SettingsService', () => {
       rightPanelFilterId: '18047',
       descriptionAutoScrollPixelsPerSecond: 12.5,
       textSizeMultiplier: 1.25,
+      leftPanelWidth: '45%',
+      bottomBarHeight: '72px',
       teamCityBuildTypeIds: ['Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite'],
     };
 
@@ -56,6 +58,8 @@ describe('SettingsService', () => {
       rightPanelFilterId: '222',
       descriptionAutoScrollPixelsPerSecond: 8.5,
       textSizeMultiplier: 0.9,
+      leftPanelWidth: '40%',
+      bottomBarHeight: '80px',
       teamCityBuildTypeIds: ['BuildA', 'BuildB'],
     };
 

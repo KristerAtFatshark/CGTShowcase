@@ -15,6 +15,8 @@ describe('App', () => {
     rightPanelFilterId: '18047',
     descriptionAutoScrollPixelsPerSecond: 12.5,
     textSizeMultiplier: 1.25,
+    leftPanelWidth: '45%',
+    bottomBarHeight: '72px',
     teamCityBuildTypeIds: ['Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite'],
   };
 
@@ -112,6 +114,13 @@ describe('App', () => {
     const fixture = setup();
     const layout = fixture.nativeElement.querySelector('.app-layout');
     expect(layout.style.getPropertyValue('--text-scale')).toBe('1.25');
+  });
+
+  it('should apply panel size settings from settings', () => {
+    const fixture = setup();
+    const layout = fixture.nativeElement.querySelector('.app-layout');
+    expect(layout.style.getPropertyValue('--left-panel-width')).toBe('45%');
+    expect(layout.style.getPropertyValue('--bottom-bar-height')).toBe('72px');
   });
 
   it('should show startup jira errors under loading text', () => {

@@ -21,6 +21,8 @@
     class="app-layout"
     [class.no-debug-bar]="!settings()!.showDebugBar"
     [style.--text-scale]="settings()!.textSizeMultiplier"
+    [style.--left-panel-width]="settings()!.leftPanelWidth"
+    [style.--bottom-bar-height]="settings()!.bottomBarHeight"
   >
     <app-top-bar [hidden]="!settings()!.showDebugBar" (refresh)="onRefresh()"></app-top-bar>
     <div class="main-content">
