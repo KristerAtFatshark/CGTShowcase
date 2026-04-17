@@ -35,6 +35,7 @@ describe('JiraService', () => {
             description: 'A description',
             status: { name: 'Open' },
             issuetype: { name: 'Task', iconUrl: 'https://example.com/task.svg' },
+            priority: { name: 'High', iconUrl: 'https://example.com/high.svg' },
             duedate: '2026-05-01',
           },
         },
@@ -53,7 +54,7 @@ describe('JiraService', () => {
 
     const jql = encodeURIComponent('project = TEST');
     const searchReq = httpMock.expectOne(
-      `/jira-api/search/jql?jql=${jql}&maxResults=50&fields=summary,status,issuetype,description,duedate`,
+      `/jira-api/search/jql?jql=${jql}&maxResults=50&fields=summary,status,issuetype,priority,description,duedate`,
     );
     expect(searchReq.request.method).toBe('GET');
     searchReq.flush(mockSearch);
@@ -70,7 +71,7 @@ describe('JiraService', () => {
 
     const jql = encodeURIComponent('project = X');
     const searchReq = httpMock.expectOne(
-      `/jira-api/search/jql?jql=${jql}&maxResults=10&fields=summary,status,issuetype,description,duedate&nextPageToken=token123`,
+      `/jira-api/search/jql?jql=${jql}&maxResults=10&fields=summary,status,issuetype,priority,description,duedate&nextPageToken=token123`,
     );
     searchReq.flush(mockSearch);
   });

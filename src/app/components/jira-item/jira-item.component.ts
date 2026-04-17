@@ -39,6 +39,14 @@ export class JiraItemComponent implements AfterViewInit, OnChanges, OnDestroy {
     return this.issue.fields.issuetype?.iconUrl ?? '';
   }
 
+  get priorityName(): string {
+    return this.issue.fields.priority?.name ?? 'No priority';
+  }
+
+  get priorityIconUrl(): string {
+    return this.issue.fields.priority?.iconUrl ?? '';
+  }
+
   get statusName(): string {
     return this.issue.fields.status?.name ?? 'Unknown';
   }

@@ -7,6 +7,12 @@
       [title]="issueTypeName"
     />
     <span class="key">{{ issue.key }}</span>
+    <span class="priority" [title]="priorityName">
+      @if (priorityIconUrl) {
+        <img class="priority-icon" [src]="priorityIconUrl" [alt]="priorityName" />
+      }
+      <span class="priority-name">{{ priorityName }}</span>
+    </span>
     <span class="status">{{ statusName }}</span>
   </div>
   <div class="row row-summary">

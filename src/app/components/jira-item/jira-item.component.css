@@ -34,10 +34,32 @@
   font-size: calc(14px * var(--text-scale, 1));
 }
 
+.priority {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  color: #f0c674;
+  font-size: calc(13px * var(--text-scale, 1));
+  min-width: 0;
+}
+
+.priority-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.priority-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .status {
   color: #8bc34a;
   font-size: calc(13px * var(--text-scale, 1));
-  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .row-summary {

@@ -16,6 +16,10 @@ describe('JiraItemComponent', () => {
         name: 'Bug',
         iconUrl: 'https://example.com/bug.svg',
       },
+      priority: {
+        name: 'Highest',
+        iconUrl: 'https://example.com/highest.svg',
+      },
       duedate: '2026-06-15',
     },
   };
@@ -50,6 +54,29 @@ describe('JiraItemComponent', () => {
   it('should display the status', () => {
     const el = fixture.nativeElement.querySelector('.status');
     expect(el.textContent).toContain('In Progress');
+  });
+
+  it('should display the priority icon and name', () => {
+    const icon = fixture.nativeElement.querySelector('.priority-icon');
+    const text = fixture.nativeElement.querySelector('.priority-name');
+    expect(icon.getAttribute('src')).toBe('https://example.com/highest.svg');
+    expect(icon.getAttribute('alt')).toBe('Highest');
+    expect(text.textContent).toContain('Highest');
+  });
+
+  it('should show priority text when icon is missing', () => {
+    const fix = TestBed.createComponent(JiraItemComponent);
+    fix.componentInstance.issue = {
+      ...mockIssue,
+      fields: {
+        ...mockIssue.fields,
+        priority: { name: 'Medium' },
+      },
+    };
+    fix.detectChanges();
+
+    expect(fix.nativeElement.querySelector('.priority-icon')).toBeNull();
+    expect(fix.nativeElement.querySelector('.priority-name').textContent).toContain('Medium');
   });
 
   it('should display the summary', () => {

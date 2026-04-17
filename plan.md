@@ -2,9 +2,9 @@
 
 ## Overview
 
-CGTShowcase is an Angular 21 standalone TypeScript application intended for Windows TV/browser display use. It loads Jira issues from two configured Jira filters, renders them in two scrollable columns, and shows TeamCity build statuses in the bottom bar.
+CGTShowcase is an Angular 21 standalone TypeScript application intended for Windows TV/browser display use. It loads Jira issues from two configured Jira filters, renders them in two scrollable columns, and shows TeamCity build status cards in the bottom bar.
 
-This document describes the current implemented application.
+This document describes the current implemented application state.
 
 ## Current Stack
 
@@ -20,27 +20,28 @@ This document describes the current implemented application.
 ### Development
 
 - `ng serve`
-- Jira requests go through `proxy.conf.json`
+- Jira and TeamCity requests both go through `proxy.conf.js`
+- `proxy.conf.js` uses separate per-route auth settings for Jira and TeamCity
 
 ### Production
 
 - `node serve.js`
-- `serve.js` serves the built Angular files and proxies Jira API requests
+- `serve.js` serves the built Angular files and proxies both Jira and TeamCity API requests
 
 ### Jira Auth
 
 - Browser code calls `/jira-api/*`
 - Jira credentials are not committed
-- Production auth comes from either:
+- Dev and production auth come from either:
   - local ignored `jira-auth.json`
-  - `JIRA_EMAIL` and `JIRA_TOKEN` environment variables
+  - `JIRA_EMAIL`, `JIRA_TOKEN`, and optional `JIRA_BASE` environment variables
 - `jira-auth.example.json` is the tracked template
 
 ### TeamCity Auth
 
 - Browser code calls `/teamcity-api/*`
 - TeamCity credentials are not committed
-- Production auth comes from either:
+- Dev and production auth come from either:
   - local ignored `teamcity-auth.json`
   - `TEAMCITY_BEARER_TOKEN` and optional `TEAMCITY_BASE` environment variables
 - `teamcity-auth.example.json` is the tracked template
@@ -61,6 +62,7 @@ CGTShowcase/
 │   │   │   └── top-bar/
 │   │   ├── models/
 │   │   │   ├── jira.models.ts
+│   │   │   ├── teamcity.models.ts
 │   │   │   └── user-settings.model.ts
 │   │   ├── services/
 │   │   │   ├── jira.service.ts
@@ -77,10 +79,10 @@ CGTShowcase/
 ├── AGENTS.md
 ├── jira-auth.example.json
 ├── plan.md
-├── proxy.conf.json
+├── proxy.conf.js
 ├── serve.js
-├── teamcity-auth.example.json
-└── status.md
+├── status.md
+└── teamcity-auth.example.json
 ```
 
 ## Current User Settings
@@ -96,6 +98,8 @@ Current shape:
   "rightPanelFilterId": "18048",
   "descriptionAutoScrollPixelsPerSecond": 10,
   "textSizeMultiplier": 1,
+  "leftPanelWidth": "50%",
+  "bottomBarHeight": "60px",
   "teamCityBuildTypeIds": ["Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite"]
 }
 ```
@@ -107,6 +111,8 @@ Fields:
 - `rightPanelFilterId`: Jira filter for the right panel
 - `descriptionAutoScrollPixelsPerSecond`: description scroll speed in pixels per second
 - `textSizeMultiplier`: multiplies UI text sizes globally
+- `leftPanelWidth`: CSS width value for the left Jira panel
+- `bottomBarHeight`: CSS height value for the bottom bar
 - `teamCityBuildTypeIds`: TeamCity build type IDs to show in the bottom bar
 
 ## Current Implemented Features
@@ -144,53 +150,61 @@ Used Jira data in the UI:
 
 ### Two Jira Panels
 
-- Implemented
 - Left and right panels use separate filter IDs from `UserSettings.json`
 - Each panel loads independently
+- Left panel width is runtime-configurable
 
 ### Automatic Initial Load
 
-- Implemented
 - On startup:
   1. load `UserSettings.json`
   2. render the app layout
   3. each panel loads Jira data automatically
+  4. TeamCity build cards load automatically
 
 ### Refresh Button
 
 - Implemented in the top bar
-- Reloads both Jira panels
+- Reloads both Jira panels and TeamCity build data
 
 ### TeamCity Build Status
 
 - Implemented in `teamcity.service.ts`
 - Bottom bar renders TeamCity build status cards for configured build type IDs
-- Current returned fields:
+- TeamCity query returns the latest finished `main` branch build for each configured build type
+- Current requested TeamCity fields:
   - `id`
   - `number`
   - `status`
   - `statusText`
   - `buildTypeId`
+  - `branchName`
+  - `defaultBranch`
   - `finishDate`
+  - `finishOnAgentDate`
+- UI uses `finishDate` and falls back to `finishOnAgentDate`
 
 ## Current UI Layout
 
-### Top Bar (A)
+### Top Bar
 
 - Optional via `showDebugBar`
 - Contains debug label and refresh button
 
-### Left Panel (B)
+### Left Panel
 
 - Scrollable list of Jira issues from the left filter
+- Width controlled by `leftPanelWidth`
 
-### Right Panel (C)
+### Right Panel
 
 - Scrollable list of Jira issues from the right filter
+- Fills the remaining horizontal space
 
-### Bottom Bar (D)
+### Bottom Bar
 
 - TeamCity build status area
+- Height controlled by `bottomBarHeight`
 
 ## Current Panel Header Layout
 
@@ -222,6 +236,22 @@ Each Jira item has 3 visual sections:
 ### Row 3
 
 - vertically scrolling description area
+
+## Current TeamCity Build Item Layout
+
+Each TeamCity build item has 2 visual sections:
+
+### Title Row
+
+- `buildTypeId`
+- success or failure text
+
+### Detail Row
+
+- `number`
+- `id`
+- finished time in Swedish local time with `SWE` suffix
+- `branchName`
 
 ## Current Description Auto-Scroll Behavior
 
@@ -259,35 +289,19 @@ This covers:
 - Jira panel initial load failures
 - missing or inaccessible Jira filters
 
-Example:
-
-```text
-Loading...
-[18046] Failed to load issues: ...
-[18048] Failed to load issues: ...
-```
-
 ### Panel-Level Errors
 
 Each Jira panel also shows its own error message when its Jira load fails.
 
 ## Styling Notes
 
-### Theme
-
 - Dark UI theme
 - Gray/charcoal panels and cards
-
-### Scrollbars
-
-- Dark scrollbar styling is implemented globally
-- Covers Chromium/WebKit and Firefox
+- Dark scrollbar styling implemented globally
 
 ## Technical Notes
 
 ### Zoneless Angular
-
-The app uses zoneless Angular runtime behavior.
 
 Configured in `app.config.ts` via:
 
@@ -302,6 +316,7 @@ Signals are used for key runtime state, including:
 - loaded/settings state
 - startup error aggregation
 - Jira panel loading and issue state
+- TeamCity build state
 
 ## Development and Production Commands
 
@@ -334,7 +349,7 @@ The test suite currently covers:
 - app startup and error overlay behavior
 - settings service
 - Jira service
-- Jenkins stub service
+- TeamCity service
 - top bar
 - Jira panel
 - Jira item
@@ -351,11 +366,14 @@ The current application includes:
 
 - runtime-editable user settings
 - two Jira-backed issue panels
+- configurable left panel width and bottom bar height
 - Jira filter names in panel headers
 - Jira issue type icons in item headers
 - configurable text scaling via user settings
 - configurable description auto-scroll speed
 - TeamCity build status integration in the bottom bar
+- TeamCity `main` branch build filtering
+- Swedish-local TeamCity completion time formatting
 - startup error display under `Loading...`
 - dark themed UI with styled scrollbars
 - non-committed Jira and TeamCity auth for local/prod use

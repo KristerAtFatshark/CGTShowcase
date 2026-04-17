@@ -16,7 +16,7 @@
 - The bottom bar height is loaded from `UserSettings.json` as a CSS length string.
 - Left and right Jira panels load from configured filter IDs.
 - Panel headers show Jira filter name and filter ID.
-- Jira items show issue type icon, key, and status in the top row.
+- Jira items show issue type icon, key, priority, and status in the top row.
 - Jira item descriptions auto-scroll using native `scrollTop` with rounded pixel steps, a 2-second pause at the bottom, and a 1-second pause at the top.
 - Startup loading failures are shown in red under `Loading...`.
 - Bottom bar shows TeamCity build status items for configured build types.
@@ -59,9 +59,11 @@
 - Moved text size scaling into `UserSettings.json` and removed the debug-bar control.
 - Updated `plan.md` to reflect the current application state and runtime model.
 - Added TeamCity auth support, TeamCity settings, and bottom-bar TeamCity build status rendering.
+- Refreshed `plan.md` to match the current Jira, TeamCity, proxy, layout, and runtime settings behavior.
 - Fixed TeamCity locator handling to read the `builds` collection response and keep only the latest finished default-branch build.
 - Updated the TeamCity locator to return only the latest finished `main` branch build.
 - Updated the TeamCity bottom-bar item UI to show the requested build fields with formatted finish time and clearer success/failure text.
+- Added Jira priority field support and render priority icon/text before status in Jira item top rows.
 - Adjusted the TeamCity bottom-bar detail row to remove duplicate build type/status text and show branch next to ID and finished time.
 - Added TeamCity build `number` to the detail row before `ID`.
 - Updated the TeamCity request fields so build completion time is returned consistently for the bottom bar.

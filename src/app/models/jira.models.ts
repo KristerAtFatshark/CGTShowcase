@@ -8,6 +8,10 @@ export interface JiraIssue {
       name: string;
       iconUrl: string;
     };
+    priority?: {
+      name: string;
+      iconUrl?: string;
+    };
     duedate: string | null;
   };
 }
