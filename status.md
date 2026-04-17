@@ -41,6 +41,7 @@
 - Added `AGENTS.md` workflow rule file.
 - Added this `status.md` operational status file.
 - Moved text size scaling into `UserSettings.json` and removed the debug-bar control.
+- Updated `plan.md` to reflect the current application state and runtime model.
 - Panel headers now show bold filter names with non-bold filter IDs in parentheses.
 - Jira items now show issue type icons.
 - Replaced duration-based auto-scroll tuning with decimal `descriptionAutoScrollPixelsPerSecond` for consistent speed across all descriptions.

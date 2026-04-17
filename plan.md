@@ -1,107 +1,117 @@
-# CGTShowcase - Current Solution Overview
+# CGTShowcase - Current Application Overview
 
 ## Overview
 
-CGTShowcase is an Angular 21 standalone TypeScript application intended for Windows TV display use in a browser. It loads Jira issues from two configured Jira filters, displays them in two side-by-side scrollable panels, and includes a stubbed Jenkins area for future build status integration.
+CGTShowcase is an Angular 21 standalone TypeScript application intended for Windows TV/browser display use. It loads Jira issues from two configured Jira filters, renders them in two scrollable columns, and reserves a bottom area for future Jenkins integration.
 
-This file describes the current implemented solution, not the original proposal.
+This document describes the current implemented application.
 
-## Current Architecture
-
-### Frontend
+## Current Stack
 
 - Angular 21 standalone application
 - TypeScript
-- Built with `@angular/build`
-- Unit tests run with Vitest
-- Uses explicit zoneless change detection via `provideZonelessChangeDetection()`
+- Zoneless change detection via `provideZonelessChangeDetection()`
+- Angular build system via `@angular/build`
+- Unit tests via Vitest
+- Windows-friendly local/prod runtime with Node.js
 
-### Runtime / Hosting
+## Runtime Model
 
-- Development: `ng serve` with `proxy.conf.json`
-- Production: `serve.js` serves the built app and proxies Jira API requests
-- Designed to run on Windows with Node.js installed
+### Development
 
-### Jira Connectivity
+- `ng serve`
+- Jira requests go through `proxy.conf.json`
 
-- Browser code calls `/jira-api/...`
-- Dev and production both proxy `/jira-api/*` to:
-  - `https://fatshark.atlassian.net/rest/api/3/*`
-- Jira credentials remain outside browser code
+### Production
+
+- `node serve.js`
+- `serve.js` serves the built Angular files and proxies Jira API requests
+
+### Jira Auth
+
+- Browser code calls `/jira-api/*`
+- Jira credentials are not committed
+- Production auth comes from either:
+  - local ignored `jira-auth.json`
+  - `JIRA_EMAIL` and `JIRA_TOKEN` environment variables
+- `jira-auth.example.json` is the tracked template
 
 ## Current Project Structure
 
 ```text
 CGTShowcase/
 ├── public/
-│   └── UserSettings.json              # Runtime-editable config
+│   ├── UserSettings.json
+│   └── favicon.ico
 ├── src/
 │   ├── app/
+│   │   ├── components/
+│   │   │   ├── bottom-bar/
+│   │   │   ├── jira-item/
+│   │   │   ├── jira-panel/
+│   │   │   └── top-bar/
 │   │   ├── models/
 │   │   │   ├── jira.models.ts
 │   │   │   └── user-settings.model.ts
 │   │   ├── services/
-│   │   │   ├── jira.service.ts
-│   │   │   ├── jira.service.spec.ts
 │   │   │   ├── jenkins.service.ts
-│   │   │   ├── jenkins.service.spec.ts
-│   │   │   ├── settings.service.ts
-│   │   │   └── settings.service.spec.ts
-│   │   ├── components/
-│   │   │   ├── top-bar/
-│   │   │   ├── jira-panel/
-│   │   │   ├── jira-item/
-│   │   │   └── bottom-bar/
-│   │   ├── app.ts
-│   │   ├── app.html
+│   │   │   ├── jira.service.ts
+│   │   │   └── settings.service.ts
+│   │   ├── app.config.ts
 │   │   ├── app.css
+│   │   ├── app.html
 │   │   ├── app.spec.ts
-│   │   └── app.config.ts
+│   │   └── app.ts
+│   ├── index.html
 │   ├── main.ts
-│   ├── styles.css
-│   └── index.html
+│   └── styles.css
+├── AGENTS.md
+├── jira-auth.example.json
+├── plan.md
 ├── proxy.conf.json
 ├── serve.js
-├── plan.md
-└── .gitignore
+└── status.md
 ```
 
 ## Current User Settings
 
-`public/UserSettings.json` is loaded at runtime and can be edited without rebuilding.
+`public/UserSettings.json` is runtime-editable and does not require a rebuild.
 
-Current content:
+Current shape:
 
 ```json
 {
   "showDebugBar": true,
   "leftPanelFilterId": "18046",
-  "rightPanelFilterId": "18048"
+  "rightPanelFilterId": "18048",
+  "descriptionAutoScrollPixelsPerSecond": 10,
+  "textSizeMultiplier": 1
 }
 ```
 
 Fields:
 
-- `showDebugBar`: shows or hides the top debug bar
-- `leftPanelFilterId`: Jira filter for left panel
-- `rightPanelFilterId`: Jira filter for right panel
+- `showDebugBar`: show or hide the top debug bar
+- `leftPanelFilterId`: Jira filter for the left panel
+- `rightPanelFilterId`: Jira filter for the right panel
+- `descriptionAutoScrollPixelsPerSecond`: description scroll speed in pixels per second
+- `textSizeMultiplier`: multiplies UI text sizes globally
 
 ## Current Implemented Features
 
-### 1. Settings File
+### Settings File
 
 - Implemented as `public/UserSettings.json`
 - Loaded by `SettingsService`
-- Runtime-editable
+- Used at startup to configure layout and behavior
 
-### 2. Jira Filter Search
+### Jira Filter Search
 
 - Implemented in `jira.service.ts`
-- Based on the provided `getFilterResults()` pattern
 - Flow:
   1. request filter details from `/jira-api/filter/{filterId}`
-  2. read the returned JQL and filter name
-  3. request issue results from `/jira-api/search/jql?...`
+  2. read Jira filter JQL and filter name
+  3. request issues from `/jira-api/search/jql?...`
 
 Requested Jira fields:
 
@@ -111,7 +121,7 @@ Requested Jira fields:
 - `description`
 - `duedate`
 
-The current UI uses:
+Used Jira data in the UI:
 
 - filter name
 - issue type icon
@@ -120,52 +130,65 @@ The current UI uses:
 - summary
 - description
 
-### 3. Two Jira Panels
+### Two Jira Panels
 
 - Implemented
-- Left and right panels each use a separate filter ID from `UserSettings.json`
+- Left and right panels use separate filter IDs from `UserSettings.json`
 - Each panel loads independently
 
-### 4. Automatic Initial Load
+### Automatic Initial Load
 
 - Implemented
 - On startup:
-  1. app loads `UserSettings.json`
-  2. renders the two Jira panels
-  3. each panel loads its Jira filter results automatically
+  1. load `UserSettings.json`
+  2. render the app layout
+  3. each panel loads Jira data automatically
 
-### 5. Refresh Button
+### Refresh Button
 
-- Implemented in top bar
-- Calls `loadIssues()` on both panels
+- Implemented in the top bar
+- Reloads both Jira panels
 
-### 6. Jenkins Stub
+### Jenkins Stub
 
 - Implemented as a stub service
-- Bottom bar remains a placeholder for now
+- Bottom bar is currently a placeholder panel
 
 ## Current UI Layout
 
 ### Top Bar (A)
 
 - Optional via `showDebugBar`
-- Contains debug label and `Refresh` button
+- Contains debug label and refresh button
 
 ### Left Panel (B)
 
-- Scrollable list of Jira items from left filter
+- Scrollable list of Jira issues from the left filter
 
 ### Right Panel (C)
 
-- Scrollable list of Jira items from right filter
+- Scrollable list of Jira issues from the right filter
 
 ### Bottom Bar (D)
 
-- Placeholder Jenkins area
+- Jenkins placeholder area
+
+## Current Panel Header Layout
+
+Each panel header shows:
+
+- bold filter name
+- non-bold filter id in parentheses
+
+Example:
+
+```text
+My Filter (18046)
+```
 
 ## Current Jira Item Layout
 
-Each Jira item has 3 sections:
+Each Jira item has 3 visual sections:
 
 ### Row 1
 
@@ -179,34 +202,45 @@ Each Jira item has 3 sections:
 
 ### Row 3
 
-- scrollable description text area
+- vertically scrolling description area
 
-## Current Panel Header Layout
+## Current Description Auto-Scroll Behavior
 
-Each panel header now shows:
+Descriptions currently:
 
-- bold filter name
-- non-bold filter id in parentheses
+- scroll at a consistent speed based on `descriptionAutoScrollPixelsPerSecond`
+- use native `scrollTop`
+- pause 2 seconds at the bottom
+- jump back to the top
+- pause 1 second at the top
+- continue scrolling again
 
-Example:
+## Current Text Scaling Behavior
 
-```text
-My Filter (18046)
-```
+Text scaling is driven by `textSizeMultiplier` in `UserSettings.json`.
+
+This multiplier is applied through a shared CSS variable and affects visible text in:
+
+- loading screen
+- top bar
+- panel headers
+- panel status/error/empty text
+- Jira item content
+- bottom bar
 
 ## Error Handling Behavior
 
-### Startup / Loading Screen
+### Startup Loading Screen
 
-If startup loading fails, the app now keeps the loading screen visible and shows load errors in red underneath `Loading...`.
+If startup loading fails, the loading screen stays visible and shows errors in red under `Loading...`.
 
 This covers:
 
-- settings file load failures
-- Jira filter failures during initial panel load
-- invalid or inaccessible Jira filter IDs
+- settings load failures
+- Jira panel initial load failures
+- missing or inaccessible Jira filters
 
-Example style of messages:
+Example:
 
 ```text
 Loading...
@@ -216,28 +250,27 @@ Loading...
 
 ### Panel-Level Errors
 
-Each Jira panel also shows its own error inside the panel content area if a load fails.
+Each Jira panel also shows its own error message when its Jira load fails.
 
 ## Styling Notes
 
-### Scrollbars
-
-- Global dark scrollbar styling is implemented
-- Matches the dark application theme
-- Covers Chromium/WebKit and Firefox
-
 ### Theme
 
-- Dark UI throughout
-- Panels and cards use gray/charcoal backgrounds
+- Dark UI theme
+- Gray/charcoal panels and cards
 
-## Current Technical Notes
+### Scrollbars
 
-### Zoneless Change Detection
+- Dark scrollbar styling is implemented globally
+- Covers Chromium/WebKit and Firefox
 
-This app does not use `zone.js`.
+## Technical Notes
 
-To ensure async UI updates work correctly, `app.config.ts` explicitly uses:
+### Zoneless Angular
+
+The app uses zoneless Angular runtime behavior.
+
+Configured in `app.config.ts` via:
 
 ```ts
 provideZonelessChangeDetection();
@@ -245,13 +278,13 @@ provideZonelessChangeDetection();
 
 ### Signals
 
-Runtime UI state uses Angular signals in key places, including:
+Signals are used for key runtime state, including:
 
-- app settings/loading state
-- panel issues/loading/error state
+- loaded/settings state
 - startup error aggregation
+- Jira panel loading and issue state
 
-## Development and Production Execution
+## Development and Production Commands
 
 ### Development
 
@@ -259,18 +292,13 @@ Runtime UI state uses Angular signals in key places, including:
 npm start
 ```
 
-Uses:
-
-- Angular dev server
-- `proxy.conf.json`
-
 ### Production Build
 
 ```bash
 npm run build
 ```
 
-### Production Serve
+### Production Server
 
 ```bash
 node serve.js
@@ -280,36 +308,11 @@ Default production port:
 
 - `4200`
 
-## Dependencies
+## Testing Status
 
-Current package dependencies remain minimal.
+The test suite currently covers:
 
-Main runtime dependencies:
-
-- `@angular/common`
-- `@angular/compiler`
-- `@angular/core`
-- `@angular/forms`
-- `@angular/platform-browser`
-- `@angular/router`
-- `rxjs`
-- `tslib`
-
-Main dev dependencies:
-
-- `@angular/build`
-- `@angular/cli`
-- `@angular/compiler-cli`
-- `typescript`
-- `vitest`
-- `jsdom`
-- `prettier`
-
-## Current Test Status
-
-The project includes unit tests for:
-
-- app bootstrap and startup error behavior
+- app startup and error overlay behavior
 - settings service
 - Jira service
 - Jenkins stub service
@@ -318,20 +321,22 @@ The project includes unit tests for:
 - Jira item
 - bottom bar
 
-Recent verified state:
+Current verified state:
 
 - tests passing
 - production build succeeding
 
 ## Summary
 
-The current solution now includes:
+The current application includes:
 
-- runtime-editable `UserSettings.json`
-- two Jira-backed panels
+- runtime-editable user settings
+- two Jira-backed issue panels
 - Jira filter names in panel headers
-- issue type icons in Jira item top rows
-- startup loading error display in red under `Loading...`
-- dark scrollbar styling
-- zoneless Angular runtime configured correctly
-- Jenkins placeholder service and UI area
+- Jira issue type icons in item headers
+- configurable text scaling via user settings
+- configurable description auto-scroll speed
+- startup error display under `Loading...`
+- dark themed UI with styled scrollbars
+- Jenkins placeholder panel
+- non-committed Jira auth for local/prod use
