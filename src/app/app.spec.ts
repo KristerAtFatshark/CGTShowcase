@@ -139,6 +139,7 @@ describe('App', () => {
     expect(bottomBar.textContent).toContain(
       'Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite',
     );
+    expect(bottomBar.textContent).toContain('Number: 456');
     expect(bottomBar.textContent).toContain('ID: 123');
     expect(bottomBar.textContent).toContain('Finished: 2026-04-17 12:00:00 SWE');
     expect(bottomBar.textContent).toContain('Branch: main');

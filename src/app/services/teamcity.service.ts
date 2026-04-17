@@ -15,9 +15,7 @@ export class TeamCityService {
   constructor(private http: HttpClient) {}
 
   getLatestBuildStatus(buildTypeId: string): Observable<TeamCityBuild | null> {
-    const locator = encodeURIComponent(
-      'running:false,defaultFilter:false,branch:default:any,count:1',
-    );
+    const locator = encodeURIComponent('running:false,branch:main,count:1');
     const fields = encodeURIComponent(
       'count,build(id,number,status,statusText,finishDate,finishOnAgentDate,buildTypeId,branchName,defaultBranch)',
     );

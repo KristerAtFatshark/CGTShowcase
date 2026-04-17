@@ -45,6 +45,7 @@ describe('BottomBarComponent', () => {
     expect(item.textContent).toContain(
       'Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite',
     );
+    expect(item.textContent).toContain('Number: 456');
     expect(item.textContent).toContain('ID: 123');
     expect(item.textContent).toContain('Finished: 2026-04-17 12:00:00 SWE');
     expect(item.textContent).toContain('Branch: main');

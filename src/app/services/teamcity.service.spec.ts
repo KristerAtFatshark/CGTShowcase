@@ -41,7 +41,7 @@ describe('TeamCityService', () => {
       });
 
     const req = httpMock.expectOne(
-      '/teamcity-api/app/rest/buildTypes/id:Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite/builds/?locator=running%3Afalse%2CdefaultFilter%3Afalse%2Cbranch%3Adefault%3Aany%2Ccount%3A1&fields=count%2Cbuild(id%2Cnumber%2Cstatus%2CstatusText%2CfinishDate%2CfinishOnAgentDate%2CbuildTypeId%2CbranchName%2CdefaultBranch)',
+      '/teamcity-api/app/rest/buildTypes/id:Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite/builds/?locator=running%3Afalse%2Cbranch%3Amain%2Ccount%3A1&fields=count%2Cbuild(id%2Cnumber%2Cstatus%2CstatusText%2CfinishDate%2CfinishOnAgentDate%2CbuildTypeId%2CbranchName%2CdefaultBranch)',
     );
     expect(req.request.method).toBe('GET');
     req.flush({
@@ -70,7 +70,7 @@ describe('TeamCityService', () => {
 
     httpMock
       .expectOne(
-        '/teamcity-api/app/rest/buildTypes/id:BuildA/builds/?locator=running%3Afalse%2CdefaultFilter%3Afalse%2Cbranch%3Adefault%3Aany%2Ccount%3A1&fields=count%2Cbuild(id%2Cnumber%2Cstatus%2CstatusText%2CfinishDate%2CfinishOnAgentDate%2CbuildTypeId%2CbranchName%2CdefaultBranch)',
+        '/teamcity-api/app/rest/buildTypes/id:BuildA/builds/?locator=running%3Afalse%2Cbranch%3Amain%2Ccount%3A1&fields=count%2Cbuild(id%2Cnumber%2Cstatus%2CstatusText%2CfinishDate%2CfinishOnAgentDate%2CbuildTypeId%2CbranchName%2CdefaultBranch)',
       )
       .flush({
         count: 1,
@@ -89,7 +89,7 @@ describe('TeamCityService', () => {
 
     httpMock
       .expectOne(
-        '/teamcity-api/app/rest/buildTypes/id:BuildB/builds/?locator=running%3Afalse%2CdefaultFilter%3Afalse%2Cbranch%3Adefault%3Aany%2Ccount%3A1&fields=count%2Cbuild(id%2Cnumber%2Cstatus%2CstatusText%2CfinishDate%2CfinishOnAgentDate%2CbuildTypeId%2CbranchName%2CdefaultBranch)',
+        '/teamcity-api/app/rest/buildTypes/id:BuildB/builds/?locator=running%3Afalse%2Cbranch%3Amain%2Ccount%3A1&fields=count%2Cbuild(id%2Cnumber%2Cstatus%2CstatusText%2CfinishDate%2CfinishOnAgentDate%2CbuildTypeId%2CbranchName%2CdefaultBranch)',
       )
       .flush({
         count: 1,
@@ -114,7 +114,7 @@ describe('TeamCityService', () => {
 
     httpMock
       .expectOne(
-        '/teamcity-api/app/rest/buildTypes/id:BuildA/builds/?locator=running%3Afalse%2CdefaultFilter%3Afalse%2Cbranch%3Adefault%3Aany%2Ccount%3A1&fields=count%2Cbuild(id%2Cnumber%2Cstatus%2CstatusText%2CfinishDate%2CfinishOnAgentDate%2CbuildTypeId%2CbranchName%2CdefaultBranch)',
+        '/teamcity-api/app/rest/buildTypes/id:BuildA/builds/?locator=running%3Afalse%2Cbranch%3Amain%2Ccount%3A1&fields=count%2Cbuild(id%2Cnumber%2Cstatus%2CstatusText%2CfinishDate%2CfinishOnAgentDate%2CbuildTypeId%2CbranchName%2CdefaultBranch)',
       )
       .flush({ count: 0, build: [] });
   });
@@ -126,7 +126,7 @@ describe('TeamCityService', () => {
 
     httpMock
       .expectOne(
-        '/teamcity-api/app/rest/buildTypes/id:BuildA/builds/?locator=running%3Afalse%2CdefaultFilter%3Afalse%2Cbranch%3Adefault%3Aany%2Ccount%3A1&fields=count%2Cbuild(id%2Cnumber%2Cstatus%2CstatusText%2CfinishDate%2CfinishOnAgentDate%2CbuildTypeId%2CbranchName%2CdefaultBranch)',
+        '/teamcity-api/app/rest/buildTypes/id:BuildA/builds/?locator=running%3Afalse%2Cbranch%3Amain%2Ccount%3A1&fields=count%2Cbuild(id%2Cnumber%2Cstatus%2CstatusText%2CfinishDate%2CfinishOnAgentDate%2CbuildTypeId%2CbranchName%2CdefaultBranch)',
       )
       .flush({
         count: 1,
