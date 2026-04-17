@@ -11,6 +11,16 @@ import { TeamCityBuild } from '../../models/teamcity.models';
 })
 export class BottomBarComponent {
   @Input() builds: TeamCityBuild[] = [];
+  private readonly swedishDateTimeFormatter = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Europe/Stockholm',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
 
   formatBranchName(branchName?: string): string {
     return branchName || 'Unknown branch';
@@ -38,7 +48,15 @@ export class BottomBarComponent {
     }
 
     const [, year, month, day, hours, minutes, seconds, sign, offsetHours, offsetMinutes] = match;
+    const normalizedOffset = `${sign}${offsetHours}:${offsetMinutes}`;
+    const date = new Date(
+      `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${normalizedOffset}`,
+    );
 
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} UTC${sign}${offsetHours}:${offsetMinutes}`;
+    if (Number.isNaN(date.getTime())) {
+      return finishDate;
+    }
+
+    return `${this.swedishDateTimeFormatter.format(date)} SWE`;
   }
 }

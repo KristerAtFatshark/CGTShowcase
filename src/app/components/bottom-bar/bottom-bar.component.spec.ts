@@ -46,7 +46,7 @@ describe('BottomBarComponent', () => {
       'Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite',
     );
     expect(item.textContent).toContain('ID: 123');
-    expect(item.textContent).toContain('Finished: 2026-04-17 10:00:00 UTC+00:00');
+    expect(item.textContent).toContain('Finished: 2026-04-17 12:00:00 SWE');
     expect(item.textContent).toContain('Branch: main');
   });
 

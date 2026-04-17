@@ -140,7 +140,7 @@ describe('App', () => {
       'Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite',
     );
     expect(bottomBar.textContent).toContain('ID: 123');
-    expect(bottomBar.textContent).toContain('Finished: 2026-04-17 10:00:00 UTC+00:00');
+    expect(bottomBar.textContent).toContain('Finished: 2026-04-17 12:00:00 SWE');
     expect(bottomBar.textContent).toContain('Branch: main');
   });
 });
