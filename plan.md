@@ -4,7 +4,7 @@
 
 CGTShowcase is an Angular 21 standalone TypeScript application intended for Windows TV/browser display use. It loads Jira issues from two configured Jira filters, renders them in two scrollable columns, and shows TeamCity build status cards in the bottom bar.
 
-This document describes the current implemented application state.
+This document reflects the current implemented solution.
 
 ## Current Stack
 
@@ -13,20 +13,27 @@ This document describes the current implemented application state.
 - Zoneless change detection via `provideZonelessChangeDetection()`
 - Angular build system via `@angular/build`
 - Unit tests via Vitest
-- Windows-friendly local/prod runtime with Node.js
+- Windows-friendly local and production runtime with Node.js
 
 ## Runtime Model
 
 ### Development
 
 - `ng serve`
-- Jira and TeamCity requests both go through `proxy.conf.js`
-- `proxy.conf.js` uses separate per-route auth settings for Jira and TeamCity
+- Local helper: `start-server.bat`
+- Local helper: `stop-server.bat`
+- Jira, TeamCity, and app-local file access all go through `proxy.conf.js`
+- `proxy.conf.js` uses separate per-route auth handling for Jira and TeamCity
+- `proxy.conf.js` also exposes a small local `/app-api/*` path for reading the distributed latest main file during dev
 
 ### Production
 
 - `node serve.js`
-- `serve.js` serves the built Angular files and proxies both Jira and TeamCity API requests
+- `serve.js` serves the built Angular files
+- `serve.js` proxies Jira and TeamCity API requests
+- `serve.js` also exposes `/app-api/distributed-latest-main` for reading the distributed latest main file
+
+## Auth Model
 
 ### Jira Auth
 
@@ -65,6 +72,7 @@ CGTShowcase/
 │   │   │   ├── teamcity.models.ts
 │   │   │   └── user-settings.model.ts
 │   │   ├── services/
+│   │   │   ├── distributed-latest-main.service.ts
 │   │   │   ├── jira.service.ts
 │   │   │   ├── settings.service.ts
 │   │   │   └── teamcity.service.ts
@@ -81,7 +89,9 @@ CGTShowcase/
 ├── plan.md
 ├── proxy.conf.js
 ├── serve.js
+├── start-server.bat
 ├── status.md
+├── stop-server.bat
 └── teamcity-auth.example.json
 ```
 
@@ -99,7 +109,8 @@ Current shape:
   "descriptionAutoScrollPixelsPerSecond": 10,
   "textSizeMultiplier": 1,
   "leftPanelWidth": "50%",
-  "bottomBarHeight": "60px",
+  "bottomBarHeight": "80px",
+  "distributedLatestMain": "\\\\filegw02\\vault\\stingray-binaries\\main\\latest\\build_info.txt",
   "teamCityBuildTypeIds": ["Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite"]
 }
 ```
@@ -113,6 +124,7 @@ Fields:
 - `textSizeMultiplier`: multiplies UI text sizes globally
 - `leftPanelWidth`: CSS width value for the left Jira panel
 - `bottomBarHeight`: CSS height value for the bottom bar
+- `distributedLatestMain`: network path to the latest distributed main build info file
 - `teamCityBuildTypeIds`: TeamCity build type IDs to show in the bottom bar
 
 ## Current Implemented Features
@@ -136,6 +148,7 @@ Requested Jira fields:
 - `summary`
 - `status`
 - `issuetype`
+- `priority`
 - `description`
 - `duedate`
 
@@ -144,6 +157,7 @@ Used Jira data in the UI:
 - filter name
 - issue type icon
 - issue key
+- priority icon and text
 - status
 - summary
 - description
@@ -161,11 +175,14 @@ Used Jira data in the UI:
   2. render the app layout
   3. each panel loads Jira data automatically
   4. TeamCity build cards load automatically
+  5. the distributed latest main file is read and matched against TeamCity if configured
 
 ### Refresh Button
 
 - Implemented in the top bar
-- Reloads both Jira panels and TeamCity build data
+- Reloads both Jira panels
+- Reloads the full TeamCity bottom-bar flow
+- Also reruns the distributed latest main file read and TeamCity revision match
 
 ### TeamCity Build Status
 
@@ -183,6 +200,24 @@ Used Jira data in the UI:
   - `finishDate`
   - `finishOnAgentDate`
 - UI uses `finishDate` and falls back to `finishOnAgentDate`
+
+### Distributed Latest Main Match
+
+- Implemented through `distributed-latest-main.service.ts`
+- Reads `distributedLatestMain`
+- Loads the file contents through `/app-api/distributed-latest-main`
+- Parses JSON from the file
+- Reads `engine_revision`
+- Uses the TeamCity revision locator to find a matching finished `main` branch build for:
+  - `Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite`
+- When a match is found, appends another TeamCity card to the right in the bottom bar
+- That appended card is labeled `Distributed Latest Main`
+
+Important note:
+
+- The current distributed main match is based on the git revision hash from `engine_revision`
+- It is not using a numeric `build.vcs.number`
+- If the distributed match resolves to the same build as the latest main card, both cards still render because the bottom-bar tracking key includes the optional label
 
 ## Current UI Layout
 
@@ -227,6 +262,7 @@ Each Jira item has 3 visual sections:
 
 - issue type icon
 - issue key
+- priority icon and priority text
 - status
 
 ### Row 2
@@ -245,6 +281,7 @@ Each TeamCity build item has 2 visual sections:
 
 - `buildTypeId`
 - success or failure text
+- optional `Distributed Latest Main` label after status for the appended distributed-main match card
 
 ### Detail Row
 
@@ -273,7 +310,7 @@ This multiplier is applied through a shared CSS variable and affects visible tex
 - loading screen
 - top bar
 - panel headers
-- panel status/error/empty text
+- panel status, error, and empty text
 - Jira item content
 - bottom bar
 
@@ -293,10 +330,16 @@ This covers:
 
 Each Jira panel also shows its own error message when its Jira load fails.
 
+### TeamCity and Distributed Main Errors
+
+- TeamCity load errors are logged to the console
+- Distributed latest main read or parse errors are logged to the console and do not block the app
+- If no distributed-main revision match is found, the extra bottom-bar card is simply omitted
+
 ## Styling Notes
 
 - Dark UI theme
-- Gray/charcoal panels and cards
+- Gray and charcoal panels and cards
 - Dark scrollbar styling implemented globally
 
 ## Technical Notes
@@ -313,7 +356,7 @@ provideZonelessChangeDetection();
 
 Signals are used for key runtime state, including:
 
-- loaded/settings state
+- loaded and settings state
 - startup error aggregation
 - Jira panel loading and issue state
 - TeamCity build state
@@ -324,6 +367,13 @@ Signals are used for key runtime state, including:
 
 ```bash
 npm start
+```
+
+### Helper Scripts
+
+```bat
+start-server.bat
+stop-server.bat
 ```
 
 ### Production Build
@@ -348,12 +398,14 @@ The test suite currently covers:
 
 - app startup and error overlay behavior
 - settings service
+- distributed latest main service
 - Jira service
 - TeamCity service
 - top bar
 - Jira panel
 - Jira item
 - bottom bar
+- refresh-button TeamCity reload behavior
 
 Current verified state:
 
@@ -368,12 +420,14 @@ The current application includes:
 - two Jira-backed issue panels
 - configurable left panel width and bottom bar height
 - Jira filter names in panel headers
-- Jira issue type icons in item headers
+- Jira issue type and priority icons in item headers
 - configurable text scaling via user settings
 - configurable description auto-scroll speed
 - TeamCity build status integration in the bottom bar
 - TeamCity `main` branch build filtering
+- distributed latest main file parsing and TeamCity revision matching
 - Swedish-local TeamCity completion time formatting
 - startup error display under `Loading...`
 - dark themed UI with styled scrollbars
-- non-committed Jira and TeamCity auth for local/prod use
+- non-committed Jira and TeamCity auth for local and production use
+- batch helpers for starting and stopping the local dev server

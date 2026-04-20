@@ -28,6 +28,7 @@
 - Pressing the refresh button reloads both Jira panels and the full TeamCity bottom-bar data flow.
 - TeamCity finished time now uses `finishDate`, with fallback to `finishOnAgentDate` when TeamCity omits `finishDate`.
 - TeamCity finished time is displayed in Swedish local time using `Europe/Stockholm` timezone rules and the `SWE` suffix.
+- Root batch helpers exist for starting and stopping the local dev server on port `4201`.
 
 ## Current Settings
 
@@ -65,7 +66,7 @@
 - Moved text size scaling into `UserSettings.json` and removed the debug-bar control.
 - Updated `plan.md` to reflect the current application state and runtime model.
 - Added TeamCity auth support, TeamCity settings, and bottom-bar TeamCity build status rendering.
-- Refreshed `plan.md` to match the current Jira, TeamCity, proxy, layout, and runtime settings behavior.
+- Refreshed `plan.md` to match the current Jira, TeamCity, distributed latest main, helper script, proxy, layout, and runtime settings behavior.
 - Fixed TeamCity locator handling to read the `builds` collection response and keep only the latest finished default-branch build.
 - Updated the TeamCity locator to return only the latest finished `main` branch build.
 - Updated the TeamCity bottom-bar item UI to show the requested build fields with formatted finish time and clearer success/failure text.
@@ -74,6 +75,7 @@
 - Added a distributed latest main file reader/parser and a TeamCity revision-match lookup that appends a second bottom-bar build item when found.
 - Moved the `Distributed Latest Main` label into the top row after status to keep the card more compact.
 - Added explicit test coverage proving the refresh button reloads TeamCity bottom-bar data, including the distributed latest main lookup.
+- Added `start-server.bat` and `stop-server.bat` for the local Angular dev server workflow.
 - Fixed bottom-bar card tracking so the latest main card and the labeled distributed-main match can both render even when they share the same TeamCity build ID.
 - Adjusted the TeamCity bottom-bar detail row to remove duplicate build type/status text and show branch next to ID and finished time.
 - Added TeamCity build `number` to the detail row before `ID`.
