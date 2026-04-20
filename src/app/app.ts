@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, computed, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { catchError, forkJoin, of, switchMap } from 'rxjs';
 import { TopBarComponent } from './components/top-bar/top-bar.component';
@@ -21,6 +21,8 @@ const DISTRIBUTED_MAIN_BUILD_TYPE_ID =
   styleUrl: './app.css',
 })
 export class App implements OnInit {
+  private static readonly AUTO_REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+
   readonly settings = signal<UserSettings | null>(null);
   readonly loaded = signal(false);
   readonly startupErrors = signal<string[]>([]);
@@ -34,6 +36,7 @@ export class App implements OnInit {
 
   @ViewChild('leftPanel') leftPanel!: JiraPanelComponent;
   @ViewChild('rightPanel') rightPanel!: JiraPanelComponent;
+  private autoRefreshIntervalId: number | null = null;
 
   constructor(
     private settingsService: SettingsService,
@@ -47,7 +50,8 @@ export class App implements OnInit {
       next: (settings) => {
         this.settings.set(settings);
         this.pendingInitialPanelLoads.set(2);
-        this.loadTeamCityBuilds(settings);
+        this.refreshAllData();
+        this.startAutoRefresh();
         this.loaded.set(true);
       },
       error: (err) => {
@@ -59,6 +63,10 @@ export class App implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.stopAutoRefresh();
+  }
+
   onInitialPanelLoadResolved(event: { filterId: string; error?: string }): void {
     this.pendingInitialPanelLoads.update((count) => Math.max(0, count - 1));
     if (event.error) {
@@ -67,9 +75,33 @@ export class App implements OnInit {
   }
 
   onRefresh(): void {
+    this.refreshAllData();
+  }
+
+  private refreshAllData(): void {
     this.leftPanel?.loadIssues();
     this.rightPanel?.loadIssues();
     this.loadTeamCityBuilds(this.settings());
+  }
+
+  private startAutoRefresh(): void {
+    this.stopAutoRefresh();
+
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    this.autoRefreshIntervalId = window.setInterval(() => {
+      this.refreshAllData();
+    }, App.AUTO_REFRESH_INTERVAL_MS);
+  }
+
+  private stopAutoRefresh(): void {
+    if (this.autoRefreshIntervalId !== null && typeof window !== 'undefined') {
+      window.clearInterval(this.autoRefreshIntervalId);
+    }
+
+    this.autoRefreshIntervalId = null;
   }
 
   private loadTeamCityBuilds(settings: UserSettings | null): void {

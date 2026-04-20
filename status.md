@@ -26,6 +26,7 @@
 - The appended distributed-main TeamCity card is labeled `Distributed Latest Main` after status in the top row.
 - TeamCity build items show build type ID in the title row, success/failure text in the title row, and number, ID, finished time, and branch in the detail row.
 - Pressing the refresh button reloads both Jira panels and the full TeamCity bottom-bar data flow.
+- The app automatically runs the same full refresh flow every 5 minutes.
 - TeamCity finished time now uses `finishDate`, with fallback to `finishOnAgentDate` when TeamCity omits `finishDate`.
 - TeamCity finished time is displayed in Swedish local time using `Europe/Stockholm` timezone rules and the `SWE` suffix.
 - Root batch helpers exist for starting and stopping the local dev server on port `4201`.
@@ -75,6 +76,7 @@
 - Added a distributed latest main file reader/parser and a TeamCity revision-match lookup that appends a second bottom-bar build item when found.
 - Moved the `Distributed Latest Main` label into the top row after status to keep the card more compact.
 - Added explicit test coverage proving the refresh button reloads TeamCity bottom-bar data, including the distributed latest main lookup.
+- Added a shared 5-minute automatic refresh that reuses the same Jira and TeamCity reload flow as the refresh button.
 - Added `start-server.bat` and `stop-server.bat` for the local Angular dev server workflow.
 - Fixed bottom-bar card tracking so the latest main card and the labeled distributed-main match can both render even when they share the same TeamCity build ID.
 - Adjusted the TeamCity bottom-bar detail row to remove duplicate build type/status text and show branch next to ID and finished time.

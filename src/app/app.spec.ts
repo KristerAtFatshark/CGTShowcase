@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
+import { vi } from 'vitest';
 import { App } from './app';
 import { UserSettings } from './models/user-settings.model';
 import { SettingsService } from './services/settings.service';
@@ -286,5 +287,75 @@ describe('App', () => {
     expect(latestBuildStatusesCalls).toBe(2);
     expect(engineRevisionCalls).toBe(2);
     expect(buildByRevisionCalls).toBe(2);
+  });
+
+  it('should automatically refresh TeamCity bottom bar data every 5 minutes', () => {
+    let latestBuildStatusesCalls = 0;
+    let engineRevisionCalls = 0;
+    let buildByRevisionCalls = 0;
+
+    vi.useFakeTimers();
+
+    const mockSettingsService = {
+      loadSettings: () => of(mockSettings),
+      getSettings: () => mockSettings,
+      settings$: of(mockSettings),
+    };
+
+    const mockJiraService = {
+      getFilterResults: () =>
+        of(
+          new HttpResponse<JiraSearchResponse>({
+            body: { issues: [] },
+            status: 200,
+          }),
+        ),
+    };
+
+    const mockTeamCityService = {
+      getLatestBuildStatuses: () => {
+        latestBuildStatusesCalls += 1;
+        return of([]);
+      },
+      getBuildByRevision: () => {
+        buildByRevisionCalls += 1;
+        return of(null);
+      },
+    };
+
+    const mockDistributedLatestMainService = {
+      getEngineRevision: () => {
+        engineRevisionCalls += 1;
+        return of('664ad19cab4eaca1e8318ac9aa674322fc99ee16');
+      },
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      imports: [App],
+      providers: [
+        { provide: SettingsService, useValue: mockSettingsService },
+        { provide: DistributedLatestMainService, useValue: mockDistributedLatestMainService },
+        { provide: JiraService, useValue: mockJiraService },
+        { provide: TeamCityService, useValue: mockTeamCityService },
+      ],
+    });
+
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+
+    expect(latestBuildStatusesCalls).toBe(1);
+    expect(engineRevisionCalls).toBe(1);
+    expect(buildByRevisionCalls).toBe(1);
+
+    vi.advanceTimersByTime(5 * 60 * 1000);
+    fixture.detectChanges();
+
+    expect(latestBuildStatusesCalls).toBe(2);
+    expect(engineRevisionCalls).toBe(2);
+    expect(buildByRevisionCalls).toBe(2);
+
+    fixture.destroy();
+    vi.useRealTimers();
   });
 });
