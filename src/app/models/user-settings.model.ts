@@ -2,6 +2,8 @@ export interface UserSettings {
   showDebugBar: boolean;
   leftPanelFilterId: string;
   rightPanelFilterId: string;
+  leftPanelShowDescription: boolean;
+  rightPanelShowDescription: boolean;
   descriptionAutoScrollPixelsPerSecond: number;
   textSizeMultiplier: number;
   leftPanelWidth: string;

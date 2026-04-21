@@ -16,6 +16,8 @@ describe('App', () => {
     showDebugBar: true,
     leftPanelFilterId: '18046',
     rightPanelFilterId: '18047',
+    leftPanelShowDescription: true,
+    rightPanelShowDescription: false,
     descriptionAutoScrollPixelsPerSecond: 12.5,
     textSizeMultiplier: 1.25,
     leftPanelWidth: '45%',
@@ -139,6 +141,16 @@ describe('App', () => {
     const layout = fixture.nativeElement.querySelector('.app-layout');
     expect(layout.style.getPropertyValue('--left-panel-width')).toBe('45%');
     expect(layout.style.getPropertyValue('--bottom-bar-height')).toBe('72px');
+  });
+
+  it('should bind panel description visibility from settings', () => {
+    const fixture = setup();
+    const panelElements = fixture.nativeElement.querySelectorAll('app-jira-panel');
+    expect(panelElements.length).toBe(2);
+
+    const component = fixture.componentInstance;
+    expect(component.settings()?.leftPanelShowDescription).toBe(true);
+    expect(component.settings()?.rightPanelShowDescription).toBe(false);
   });
 
   it('should show startup jira errors under loading text', () => {

@@ -11,7 +11,11 @@ describe('JiraPanelComponent', () => {
   let fixture: ComponentFixture<JiraPanelComponent>;
   let getFilterResultsSpy: ReturnType<typeof vi.fn>;
 
-  function setup(issues: JiraSearchResponse['issues'] = [], shouldError = false): void {
+  function setup(
+    issues: JiraSearchResponse['issues'] = [],
+    shouldError = false,
+    showDescription = true,
+  ): void {
     getFilterResultsSpy = vi.fn();
 
     if (shouldError) {
@@ -33,6 +37,7 @@ describe('JiraPanelComponent', () => {
     component = fixture.componentInstance;
     component.filterId = '18046';
     component.descriptionAutoScrollPixelsPerSecond = 12.5;
+    component.showDescription = showDescription;
     fixture.detectChanges();
   }
 
@@ -74,6 +79,29 @@ describe('JiraPanelComponent', () => {
   it('should keep configured auto scroll speed', () => {
     setup();
     expect(component.descriptionAutoScrollPixelsPerSecond).toBe(12.5);
+  });
+
+  it('should keep the showDescription setting for jira items', () => {
+    setup(
+      [
+        {
+          key: 'TEST-1',
+          fields: {
+            summary: 'Issue 1',
+            description: 'Desc',
+            status: { name: 'Open' },
+            issuetype: { name: 'Bug', iconUrl: 'https://example.com/bug.svg' },
+            duedate: null,
+          },
+        },
+      ],
+      false,
+      false,
+    );
+
+    const item = fixture.nativeElement.querySelector('app-jira-item');
+    expect(item).toBeTruthy();
+    expect(component.showDescription).toBe(false);
   });
 
   it('should show error on failure', () => {

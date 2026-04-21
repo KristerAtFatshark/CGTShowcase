@@ -14,6 +14,7 @@ import { CommonModule } from '@angular/common';
 export class JiraPanelComponent implements OnInit {
   @Input({ required: true }) filterId!: string;
   @Input() descriptionAutoScrollPixelsPerSecond = 0;
+  @Input() showDescription = true;
   @Output() initialLoadResolved = new EventEmitter<{ filterId: string; error?: string }>();
 
   readonly issues = signal<JiraIssue[]>([]);

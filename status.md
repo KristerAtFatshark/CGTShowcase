@@ -16,9 +16,14 @@
 - The left Jira panel width is loaded from `UserSettings.json` as a CSS length string.
 - The bottom bar height is loaded from `UserSettings.json` as a CSS length string.
 - The `distributedLatestMain` path is loaded from `UserSettings.json` as a network file path string.
+- Left and right Jira description visibility are loaded separately from `UserSettings.json`.
 - Left and right Jira panels load from configured filter IDs.
 - Panel headers show Jira filter name and filter ID.
 - Jira items show issue type icon, key, priority, and status in the top row.
+- Jira ticket cards show only the `Summary / Goal` section from the Jira description field.
+- Unreadable or unsupported Jira description nodes are fully removed from the rendered Summary / Goal text, including leftover blank lines.
+- Jira summary text is bold and 2px larger than the description text.
+- Right-panel Jira cards keep the summary row and hide the description row.
 - Jira item descriptions auto-scroll using native `scrollTop` with rounded pixel steps, a 2-second pause at the bottom, and a 1-second pause at the top.
 - Startup loading failures are shown in red under `Loading...`.
 - Bottom bar shows TeamCity build status items for configured build types.
@@ -39,6 +44,8 @@
 - Left panel filter ID: `18046`
 - Right panel filter ID: `18048`
 - Description auto-scroll speed: `12.5` pixels/second
+- Left panel show description: `true`
+- Right panel show description: `false`
 - Text size multiplier: `1`
 - Left panel width: `50%`
 - Bottom bar height: `60px`
@@ -80,6 +87,8 @@
 - Moved the `Distributed Latest Main` label into the top row after status to keep the card more compact.
 - Added explicit test coverage proving the refresh button reloads TeamCity bottom-bar data, including the distributed latest main lookup.
 - Added browser-cookie-backed debug bar setting overrides that fall back to server settings when no local override exists.
+- Limited Jira card descriptions to the `Summary / Goal` section and added a fallback message when that section is missing.
+- Corrected the panel-specific Jira card behavior so only right-panel descriptions are hidden; summaries remain visible in both panels.
 - Added a hidden top-right reveal hotspot that shows an orange border on hover and restores the browser-local debug bar override when clicked.
 - Added a shared 5-minute automatic refresh that reuses the same Jira and TeamCity reload flow as the refresh button.
 - Added `start-server.bat` and `stop-server.bat` for the local Angular dev server workflow.
@@ -91,6 +100,7 @@
 - Changed the Swedish time suffix from `svensk tid` to `SWE`.
 - Merged the Angular dev proxy setup into `proxy.conf.js` so Jira and TeamCity both work from one config with route-specific auth.
 - Added runtime layout settings for left panel width and bottom bar height in `UserSettings.json`.
+- Added `leftPanelShowDescription` and `rightPanelShowDescription` to runtime settings, with defaults of left enabled and right disabled.
 - Restored Jira auth in the dev proxy after the TeamCity proxy update removed it.
 - Removed the remaining Jenkins placeholder naming in favor of TeamCity terminology.
 - Panel headers now show bold filter names with non-bold filter IDs in parentheses.

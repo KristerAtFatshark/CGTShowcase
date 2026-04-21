@@ -10,7 +10,32 @@ describe('JiraItemComponent', () => {
     key: 'TEST-42',
     fields: {
       summary: 'Fix the widget',
-      description: 'The widget is broken and needs fixing.',
+      description: {
+        type: 'doc',
+        version: 1,
+        content: [
+          {
+            type: 'heading',
+            content: [{ type: 'text', text: 'Summary / Goal' }],
+          },
+          {
+            type: 'paragraph',
+            content: [{ type: 'text', text: 'The widget is broken and needs fixing.' }],
+          },
+          {
+            type: 'mediaSingle',
+            attrs: { layout: 'center' },
+          },
+          {
+            type: 'heading',
+            content: [{ type: 'text', text: 'Implementation Details' }],
+          },
+          {
+            type: 'paragraph',
+            content: [{ type: 'text', text: 'Do not show this in the card.' }],
+          },
+        ],
+      } as unknown as string,
       status: { name: 'In Progress' },
       issuetype: {
         name: 'Bug',
@@ -84,12 +109,25 @@ describe('JiraItemComponent', () => {
     expect(el.textContent).toContain('Fix the widget');
   });
 
+  it('should hide the description when showDescription is false', () => {
+    const fix = TestBed.createComponent(JiraItemComponent);
+    fix.componentInstance.issue = mockIssue;
+    fix.componentInstance.showDescription = false;
+    fix.detectChanges();
+
+    expect(fix.nativeElement.querySelector('.row-summary')).toBeTruthy();
+    expect(fix.nativeElement.querySelector('.row-description')).toBeNull();
+  });
+
   it('should display the description', () => {
     const el = fixture.nativeElement.querySelector('.description-box');
     expect(el.textContent).toContain('The widget is broken');
+    expect(el.textContent).not.toContain('No description');
+    expect(el.textContent).not.toContain('Do not show this in the card');
+    expect(component.description).toBe('The widget is broken and needs fixing.');
   });
 
-  it('should show "No description" when description is null', () => {
+  it('should show fallback text when description is null', () => {
     const fix = TestBed.createComponent(JiraItemComponent);
     fix.componentInstance.issue = {
       ...mockIssue,
@@ -97,7 +135,35 @@ describe('JiraItemComponent', () => {
     };
     fix.detectChanges();
     const el = fix.nativeElement.querySelector('.description-box');
-    expect(el.textContent).toContain('No description');
+    expect(el.textContent).toContain('Summary / Goal section is missing from this ticket');
+  });
+
+  it('should show fallback text when Summary / Goal section is missing', () => {
+    const fix = TestBed.createComponent(JiraItemComponent);
+    fix.componentInstance.issue = {
+      ...mockIssue,
+      fields: {
+        ...mockIssue.fields,
+        description: {
+          type: 'doc',
+          version: 1,
+          content: [
+            {
+              type: 'heading',
+              content: [{ type: 'text', text: 'Implementation Details' }],
+            },
+            {
+              type: 'paragraph',
+              content: [{ type: 'text', text: 'Only implementation details exist.' }],
+            },
+          ],
+        } as unknown as string,
+      },
+    };
+    fix.detectChanges();
+
+    const el = fix.nativeElement.querySelector('.description-box');
+    expect(el.textContent).toContain('Summary / Goal section is missing from this ticket');
   });
 
   it('should accept auto scroll pixels per second input', () => {

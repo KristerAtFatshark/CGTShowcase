@@ -18,9 +18,12 @@ import { JiraIssue } from '../../models/jira.models';
 export class JiraItemComponent implements AfterViewInit, OnChanges, OnDestroy {
   private static readonly BOTTOM_PAUSE_MS = 2000;
   private static readonly TOP_PAUSE_MS = 1000;
+  private static readonly MISSING_SUMMARY_GOAL_TEXT =
+    'Summary / Goal section is missing from this ticket';
 
   @Input({ required: true }) issue!: JiraIssue;
   @Input() autoScrollPixelsPerSecond = 0;
+  @Input() showDescription = true;
   @ViewChild('descriptionViewport') descriptionViewport?: ElementRef<HTMLDivElement>;
   @ViewChild('descriptionContent') descriptionContent?: ElementRef<HTMLDivElement>;
 
@@ -53,9 +56,9 @@ export class JiraItemComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   get description(): string {
     const desc = this.issue.fields.description;
-    if (!desc) return 'No description';
-    if (typeof desc === 'string') return desc;
-    return this.extractTextFromAdf(desc);
+    if (!desc) return JiraItemComponent.MISSING_SUMMARY_GOAL_TEXT;
+    if (typeof desc === 'string') return desc.trim() || JiraItemComponent.MISSING_SUMMARY_GOAL_TEXT;
+    return this.extractSummaryGoalFromAdf(desc);
   }
 
   ngAfterViewInit(): void {
@@ -72,13 +75,84 @@ export class JiraItemComponent implements AfterViewInit, OnChanges, OnDestroy {
 
   private extractTextFromAdf(adf: unknown): string {
     if (typeof adf === 'string') return adf;
-    if (!adf || typeof adf !== 'object') return 'No description';
+    if (!adf || typeof adf !== 'object') return '';
     const node = adf as { type?: string; text?: string; content?: unknown[] };
     if (node.type === 'text' && node.text) return node.text;
     if (Array.isArray(node.content)) {
-      return node.content.map((child) => this.extractTextFromAdf(child)).join('\n');
+      const childTexts = node.content
+        .map((child) => this.extractTextFromAdf(child).trim())
+        .filter((text) => text.length > 0);
+
+      if (childTexts.length === 0) {
+        return '';
+      }
+
+      return node.type === 'paragraph' || node.type === 'heading'
+        ? childTexts.join('')
+        : childTexts.join('\n');
     }
-    return 'No description';
+    return '';
+  }
+
+  private extractSummaryGoalFromAdf(adf: unknown): string {
+    if (!adf || typeof adf !== 'object') {
+      return JiraItemComponent.MISSING_SUMMARY_GOAL_TEXT;
+    }
+
+    const root = adf as { content?: unknown[] };
+    const content = Array.isArray(root.content) ? root.content : [];
+    let collecting = false;
+    const sectionParts: string[] = [];
+
+    for (const node of content) {
+      const headingText = this.getHeadingText(node);
+      if (headingText) {
+        if (collecting) {
+          break;
+        }
+
+        collecting = this.normalizeHeading(headingText) === 'summary / goal';
+        continue;
+      }
+
+      if (!collecting) {
+        continue;
+      }
+
+      const text = this.compactLines(this.extractTextFromAdf(node));
+      if (text) {
+        sectionParts.push(text);
+      }
+    }
+
+    return sectionParts.length > 0
+      ? sectionParts.join('\n').trim()
+      : JiraItemComponent.MISSING_SUMMARY_GOAL_TEXT;
+  }
+
+  private getHeadingText(node: unknown): string | null {
+    if (!node || typeof node !== 'object') {
+      return null;
+    }
+
+    const adfNode = node as { type?: string; content?: unknown[] };
+    if (adfNode.type !== 'heading') {
+      return null;
+    }
+
+    return this.extractTextFromAdf(adfNode).trim() || null;
+  }
+
+  private normalizeHeading(text: string): string {
+    return text.replace(/\s+/g, ' ').trim().toLowerCase();
+  }
+
+  private compactLines(text: string): string {
+    return text
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0)
+      .join('\n');
   }
 
   private restartAutoScroll(): void {

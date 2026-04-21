@@ -43,6 +43,7 @@
           #leftPanel
           [filterId]="settings()!.leftPanelFilterId"
           [descriptionAutoScrollPixelsPerSecond]="settings()!.descriptionAutoScrollPixelsPerSecond"
+          [showDescription]="settings()!.leftPanelShowDescription"
           (initialLoadResolved)="onInitialPanelLoadResolved($event)"
         ></app-jira-panel>
       </div>
@@ -51,6 +52,7 @@
           #rightPanel
           [filterId]="settings()!.rightPanelFilterId"
           [descriptionAutoScrollPixelsPerSecond]="settings()!.descriptionAutoScrollPixelsPerSecond"
+          [showDescription]="settings()!.rightPanelShowDescription"
           (initialLoadResolved)="onInitialPanelLoadResolved($event)"
         ></app-jira-panel>
       </div>

@@ -70,7 +70,8 @@
 }
 
 .summary {
-  font-size: calc(14px * var(--text-scale, 1));
+  font-size: calc(15px * var(--text-scale, 1));
+  font-weight: 700;
   color: #ddd;
   white-space: nowrap;
   overflow: hidden;
