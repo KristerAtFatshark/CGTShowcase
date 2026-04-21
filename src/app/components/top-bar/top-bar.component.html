@@ -1,4 +1,55 @@
 <div class="top-bar">
   <span class="debug-label">Debug Bar</span>
-  <button class="refresh-btn" (click)="onRefresh()">Refresh</button>
+  <div class="debug-controls">
+    <label class="control checkbox-control">
+      <span>Show Debug</span>
+      <input
+        type="checkbox"
+        [ngModel]="settings.showDebugBar"
+        (ngModelChange)="updateSetting('showDebugBar', $event)"
+      />
+    </label>
+
+    <label class="control">
+      <span>Text Scale</span>
+      <input
+        type="number"
+        step="0.1"
+        min="0.5"
+        [ngModel]="settings.textSizeMultiplier"
+        (ngModelChange)="updateSetting('textSizeMultiplier', +$event)"
+      />
+    </label>
+
+    <label class="control">
+      <span>Left Width</span>
+      <input
+        type="text"
+        [ngModel]="settings.leftPanelWidth"
+        (ngModelChange)="updateSetting('leftPanelWidth', $event)"
+      />
+    </label>
+
+    <label class="control">
+      <span>Bottom Height</span>
+      <input
+        type="text"
+        [ngModel]="settings.bottomBarHeight"
+        (ngModelChange)="updateSetting('bottomBarHeight', $event)"
+      />
+    </label>
+
+    <label class="control">
+      <span>Scroll Speed</span>
+      <input
+        type="number"
+        step="0.1"
+        min="0"
+        [ngModel]="settings.descriptionAutoScrollPixelsPerSecond"
+        (ngModelChange)="updateSetting('descriptionAutoScrollPixelsPerSecond', +$event)"
+      />
+    </label>
+
+    <button class="refresh-btn" (click)="onRefresh()">Refresh</button>
+  </div>
 </div>

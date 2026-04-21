@@ -17,6 +17,13 @@
     </div>
   </div>
 } @else {
+  <button
+    class="debug-bar-reveal-button"
+    type="button"
+    aria-label="Show debug bar"
+    (click)="showDebugBarFromRevealButton()"
+  ></button>
+
   <div
     class="app-layout"
     [class.no-debug-bar]="!settings()!.showDebugBar"
@@ -24,7 +31,12 @@
     [style.--left-panel-width]="settings()!.leftPanelWidth"
     [style.--bottom-bar-height]="settings()!.bottomBarHeight"
   >
-    <app-top-bar [hidden]="!settings()!.showDebugBar" (refresh)="onRefresh()"></app-top-bar>
+    <app-top-bar
+      [hidden]="!settings()!.showDebugBar"
+      [settings]="debugBarSettings()"
+      (refresh)="onRefresh()"
+      (settingChanged)="onDebugSettingChanged($event)"
+    ></app-top-bar>
     <div class="main-content">
       <div class="panel left-panel">
         <app-jira-panel

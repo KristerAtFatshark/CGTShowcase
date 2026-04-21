@@ -11,6 +11,7 @@
 ## Current Behavior
 
 - Top debug bar can be hidden with `showDebugBar`.
+- The debug bar can override selected settings per browser via cookie-backed local settings.
 - The text size multiplier is loaded from `UserSettings.json` and scales component-level text sizes directly.
 - The left Jira panel width is loaded from `UserSettings.json` as a CSS length string.
 - The bottom bar height is loaded from `UserSettings.json` as a CSS length string.
@@ -30,6 +31,8 @@
 - TeamCity finished time now uses `finishDate`, with fallback to `finishOnAgentDate` when TeamCity omits `finishDate`.
 - TeamCity finished time is displayed in Swedish local time using `Europe/Stockholm` timezone rules and the `SWE` suffix.
 - Root batch helpers exist for starting and stopping the local dev server on port `4201`.
+- Debug bar controls exist for `showDebugBar`, `textSizeMultiplier`, `leftPanelWidth`, `bottomBarHeight`, and `descriptionAutoScrollPixelsPerSecond`.
+- A hidden 32x21 top-right reveal button can turn the browser-local debug bar setting back on.
 
 ## Current Settings
 
@@ -76,6 +79,8 @@
 - Added a distributed latest main file reader/parser and a TeamCity revision-match lookup that appends a second bottom-bar build item when found.
 - Moved the `Distributed Latest Main` label into the top row after status to keep the card more compact.
 - Added explicit test coverage proving the refresh button reloads TeamCity bottom-bar data, including the distributed latest main lookup.
+- Added browser-cookie-backed debug bar setting overrides that fall back to server settings when no local override exists.
+- Added a hidden top-right reveal hotspot that shows an orange border on hover and restores the browser-local debug bar override when clicked.
 - Added a shared 5-minute automatic refresh that reuses the same Jira and TeamCity reload flow as the refresh button.
 - Added `start-server.bat` and `stop-server.bat` for the local Angular dev server workflow.
 - Fixed bottom-bar card tracking so the latest main card and the labeled distributed-main match can both render even when they share the same TeamCity build ID.

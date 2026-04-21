@@ -5,6 +5,7 @@ import { vi } from 'vitest';
 import { App } from './app';
 import { UserSettings } from './models/user-settings.model';
 import { SettingsService } from './services/settings.service';
+import { BrowserSettingsService } from './services/browser-settings.service';
 import { DistributedLatestMainService } from './services/distributed-latest-main.service';
 import { JiraService } from './services/jira.service';
 import { JiraSearchResponse } from './models/jira.models';
@@ -73,10 +74,17 @@ describe('App', () => {
       getEngineRevision: () => of(null),
     };
 
+    const mockBrowserSettingsService = {
+      getOverrides: () => ({}),
+      overrides$: of({}),
+      updateOverride: () => {},
+    };
+
     TestBed.configureTestingModule({
       imports: [App],
       providers: [
         { provide: SettingsService, useValue: mockSettingsService },
+        { provide: BrowserSettingsService, useValue: mockBrowserSettingsService },
         { provide: DistributedLatestMainService, useValue: mockDistributedLatestMainService },
         { provide: JiraService, useValue: mockJiraService },
         { provide: TeamCityService, useValue: mockTeamCityService },
@@ -152,6 +160,176 @@ describe('App', () => {
     expect(bottomBar.textContent).toContain('ID: 123');
     expect(bottomBar.textContent).toContain('Finished: 2026-04-17 12:00:00 SWE');
     expect(bottomBar.textContent).toContain('Branch: main');
+  });
+
+  it('should apply browser settings overrides on top of server settings', () => {
+    const mockSettingsService = {
+      loadSettings: () => of(mockSettings),
+      getSettings: () => mockSettings,
+      settings$: of(mockSettings),
+    };
+
+    const mockJiraService = {
+      getFilterResults: () =>
+        of(
+          new HttpResponse<JiraSearchResponse>({
+            body: { issues: [] },
+            status: 200,
+          }),
+        ),
+    };
+
+    const mockTeamCityService = {
+      getLatestBuildStatuses: () => of([]),
+      getBuildByRevision: () => of(null),
+    };
+
+    const mockDistributedLatestMainService = {
+      getEngineRevision: () => of(null),
+    };
+
+    const mockBrowserSettingsService = {
+      getOverrides: () => ({ textSizeMultiplier: 1.6, leftPanelWidth: '40%' }),
+      overrides$: of({ textSizeMultiplier: 1.6, leftPanelWidth: '40%' }),
+      updateOverride: () => {},
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      imports: [App],
+      providers: [
+        { provide: SettingsService, useValue: mockSettingsService },
+        { provide: BrowserSettingsService, useValue: mockBrowserSettingsService },
+        { provide: DistributedLatestMainService, useValue: mockDistributedLatestMainService },
+        { provide: JiraService, useValue: mockJiraService },
+        { provide: TeamCityService, useValue: mockTeamCityService },
+      ],
+    });
+
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+
+    const layout = fixture.nativeElement.querySelector('.app-layout');
+    expect(layout.style.getPropertyValue('--text-scale')).toBe('1.6');
+    expect(layout.style.getPropertyValue('--left-panel-width')).toBe('40%');
+  });
+
+  it('should persist debug bar setting changes through the browser settings service', () => {
+    let overrideUpdate: { key: string; value: unknown } | undefined;
+
+    const mockSettingsService = {
+      loadSettings: () => of(mockSettings),
+      getSettings: () => mockSettings,
+      settings$: of(mockSettings),
+    };
+
+    const mockJiraService = {
+      getFilterResults: () =>
+        of(
+          new HttpResponse<JiraSearchResponse>({
+            body: { issues: [] },
+            status: 200,
+          }),
+        ),
+    };
+
+    const mockTeamCityService = {
+      getLatestBuildStatuses: () => of([]),
+      getBuildByRevision: () => of(null),
+    };
+
+    const mockDistributedLatestMainService = {
+      getEngineRevision: () => of(null),
+    };
+
+    const mockBrowserSettingsService = {
+      getOverrides: () => ({}),
+      overrides$: of({}),
+      updateOverride: (key: string, value: unknown) => {
+        overrideUpdate = { key, value };
+      },
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      imports: [App],
+      providers: [
+        { provide: SettingsService, useValue: mockSettingsService },
+        { provide: BrowserSettingsService, useValue: mockBrowserSettingsService },
+        { provide: DistributedLatestMainService, useValue: mockDistributedLatestMainService },
+        { provide: JiraService, useValue: mockJiraService },
+        { provide: TeamCityService, useValue: mockTeamCityService },
+      ],
+    });
+
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+
+    const textScaleInput = fixture.nativeElement.querySelector('input[type="number"]');
+    textScaleInput.value = '1.7';
+    textScaleInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    expect(overrideUpdate).toEqual({ key: 'textSizeMultiplier', value: 1.7 });
+  });
+
+  it('should show the debug bar from the reveal button', () => {
+    let overrideUpdate: { key: string; value: unknown } | undefined;
+
+    const hiddenSettings = { ...mockSettings, showDebugBar: false };
+
+    const mockSettingsService = {
+      loadSettings: () => of(hiddenSettings),
+      getSettings: () => hiddenSettings,
+      settings$: of(hiddenSettings),
+    };
+
+    const mockJiraService = {
+      getFilterResults: () =>
+        of(
+          new HttpResponse<JiraSearchResponse>({
+            body: { issues: [] },
+            status: 200,
+          }),
+        ),
+    };
+
+    const mockTeamCityService = {
+      getLatestBuildStatuses: () => of([]),
+      getBuildByRevision: () => of(null),
+    };
+
+    const mockDistributedLatestMainService = {
+      getEngineRevision: () => of(null),
+    };
+
+    const mockBrowserSettingsService = {
+      getOverrides: () => ({ showDebugBar: false }),
+      overrides$: of({ showDebugBar: false }),
+      updateOverride: (key: string, value: unknown) => {
+        overrideUpdate = { key, value };
+      },
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      imports: [App],
+      providers: [
+        { provide: SettingsService, useValue: mockSettingsService },
+        { provide: BrowserSettingsService, useValue: mockBrowserSettingsService },
+        { provide: DistributedLatestMainService, useValue: mockDistributedLatestMainService },
+        { provide: JiraService, useValue: mockJiraService },
+        { provide: TeamCityService, useValue: mockTeamCityService },
+      ],
+    });
+
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+
+    const revealButton = fixture.nativeElement.querySelector('.debug-bar-reveal-button');
+    revealButton.click();
+
+    expect(overrideUpdate).toEqual({ key: 'showDebugBar', value: true });
   });
 
   it('should append the distributed latest main TeamCity build when a revision matches', () => {

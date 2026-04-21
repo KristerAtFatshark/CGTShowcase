@@ -12,6 +12,13 @@ describe('TopBarComponent', () => {
 
     fixture = TestBed.createComponent(TopBarComponent);
     component = fixture.componentInstance;
+    component.settings = {
+      showDebugBar: true,
+      textSizeMultiplier: 1,
+      leftPanelWidth: '50%',
+      bottomBarHeight: '60px',
+      descriptionAutoScrollPixelsPerSecond: 10,
+    };
     fixture.detectChanges();
   });
 
@@ -33,5 +40,21 @@ describe('TopBarComponent', () => {
     button.click();
 
     expect(refreshed).toBe(true);
+  });
+
+  it('should render debug setting controls', () => {
+    expect(fixture.nativeElement.querySelectorAll('.control').length).toBe(5);
+  });
+
+  it('should emit settingChanged when a setting changes', () => {
+    let change: { key: string; value: string | number | boolean } | undefined;
+    component.settingChanged.subscribe((event) => (change = event));
+
+    const input = fixture.nativeElement.querySelector('input[type="number"]');
+    input.value = '1.5';
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    expect(change).toEqual({ key: 'textSizeMultiplier', value: 1.5 });
   });
 });

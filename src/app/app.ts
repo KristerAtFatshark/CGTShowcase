@@ -9,6 +9,14 @@ import { UserSettings } from './models/user-settings.model';
 import { TeamCityBuild } from './models/teamcity.models';
 import { TeamCityService } from './services/teamcity.service';
 import { DistributedLatestMainService } from './services/distributed-latest-main.service';
+import {
+  BrowserSettingsOverrides,
+  BrowserSettingsService,
+} from './services/browser-settings.service';
+import {
+  DebugBarSettingKey,
+  DebugBarSettingsViewModel,
+} from './components/top-bar/top-bar.component';
 
 const DISTRIBUTED_MAIN_BUILD_TYPE_ID =
   'Live_DarktideEngineGameStingrayEngineEditorAndToolsComposite';
@@ -23,11 +31,34 @@ const DISTRIBUTED_MAIN_BUILD_TYPE_ID =
 export class App implements OnInit {
   private static readonly AUTO_REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 
-  readonly settings = signal<UserSettings | null>(null);
+  readonly serverSettings = signal<UserSettings | null>(null);
+  readonly browserSettingsOverrides = signal<BrowserSettingsOverrides>({});
+  readonly settings = computed<UserSettings | null>(() => {
+    const serverSettings = this.serverSettings();
+    if (!serverSettings) {
+      return null;
+    }
+
+    return {
+      ...serverSettings,
+      ...this.browserSettingsOverrides(),
+    };
+  });
   readonly loaded = signal(false);
   readonly startupErrors = signal<string[]>([]);
   readonly pendingInitialPanelLoads = signal(0);
   readonly teamCityBuilds = signal<TeamCityBuild[]>([]);
+  readonly debugBarSettings = computed<DebugBarSettingsViewModel>(() => {
+    const settings = this.settings();
+
+    return {
+      showDebugBar: settings?.showDebugBar ?? true,
+      textSizeMultiplier: settings?.textSizeMultiplier ?? 1,
+      leftPanelWidth: settings?.leftPanelWidth ?? '50%',
+      bottomBarHeight: settings?.bottomBarHeight ?? '60px',
+      descriptionAutoScrollPixelsPerSecond: settings?.descriptionAutoScrollPixelsPerSecond ?? 10,
+    };
+  });
   readonly showStartupOverlay = computed(
     () =>
       this.settings() !== null &&
@@ -42,13 +73,19 @@ export class App implements OnInit {
     private settingsService: SettingsService,
     private teamCityService: TeamCityService,
     private distributedLatestMainService: DistributedLatestMainService,
+    private browserSettingsService: BrowserSettingsService,
   ) {}
 
   ngOnInit(): void {
     this.startupErrors.set([]);
+    this.browserSettingsOverrides.set(this.browserSettingsService.getOverrides());
+    this.browserSettingsService.overrides$.subscribe((overrides) => {
+      this.browserSettingsOverrides.set(overrides);
+    });
+
     this.settingsService.loadSettings().subscribe({
       next: (settings) => {
-        this.settings.set(settings);
+        this.serverSettings.set(settings);
         this.pendingInitialPanelLoads.set(2);
         this.refreshAllData();
         this.startAutoRefresh();
@@ -76,6 +113,36 @@ export class App implements OnInit {
 
   onRefresh(): void {
     this.refreshAllData();
+  }
+
+  onDebugSettingChanged(event: {
+    key: DebugBarSettingKey;
+    value: string | number | boolean;
+  }): void {
+    switch (event.key) {
+      case 'showDebugBar':
+        this.browserSettingsService.updateOverride('showDebugBar', Boolean(event.value));
+        break;
+      case 'textSizeMultiplier':
+        this.browserSettingsService.updateOverride('textSizeMultiplier', Number(event.value));
+        break;
+      case 'leftPanelWidth':
+        this.browserSettingsService.updateOverride('leftPanelWidth', String(event.value));
+        break;
+      case 'bottomBarHeight':
+        this.browserSettingsService.updateOverride('bottomBarHeight', String(event.value));
+        break;
+      case 'descriptionAutoScrollPixelsPerSecond':
+        this.browserSettingsService.updateOverride(
+          'descriptionAutoScrollPixelsPerSecond',
+          Number(event.value),
+        );
+        break;
+    }
+  }
+
+  showDebugBarFromRevealButton(): void {
+    this.browserSettingsService.updateOverride('showDebugBar', true);
   }
 
   private refreshAllData(): void {

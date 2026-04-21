@@ -4,6 +4,23 @@
   height: 100vh;
 }
 
+.debug-bar-reveal-button {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 32px;
+  height: 21px;
+  padding: 0;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  z-index: 20;
+}
+
+.debug-bar-reveal-button:hover {
+  border-color: #ff9800;
+}
+
 .loading-screen,
 .error-screen {
   display: flex;
@@ -34,7 +51,7 @@
 .loading-overlay {
   position: fixed;
   inset: 0;
-  z-index: 10;
+  z-index: 30;
   background-color: rgba(26, 26, 26, 0.96);
 }
 
