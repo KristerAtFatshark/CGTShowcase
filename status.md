@@ -17,7 +17,11 @@
 - The bottom bar height is loaded from `UserSettings.json` as a CSS length string.
 - The `distributedLatestMain` path is loaded from `UserSettings.json` as a network file path string.
 - Left and right Jira description visibility are loaded separately from `UserSettings.json`.
+- Jira panel page size is loaded from `UserSettings.json`.
+- Jira panel auto page-flip interval is loaded from `UserSettings.json`.
 - Left and right Jira panels load from configured filter IDs.
+- Jira panels support paging with a runtime-configurable maximum items per page.
+- Jira panels flip pages automatically instead of showing paging buttons.
 - Panel headers show Jira filter name and filter ID.
 - Jira items show issue type icon, key, priority, and status in the top row.
 - Jira ticket cards show only the `Summary / Goal` section from the Jira description field.
@@ -46,6 +50,8 @@
 - Description auto-scroll speed: `12.5` pixels/second
 - Left panel show description: `true`
 - Right panel show description: `false`
+- Jira panel max items per page: `4`
+- Jira panel auto page flip seconds: `30`
 - Text size multiplier: `1`
 - Left panel width: `50%`
 - Bottom bar height: `60px`
@@ -101,6 +107,8 @@
 - Merged the Angular dev proxy setup into `proxy.conf.js` so Jira and TeamCity both work from one config with route-specific auth.
 - Added runtime layout settings for left panel width and bottom bar height in `UserSettings.json`.
 - Added `leftPanelShowDescription` and `rightPanelShowDescription` to runtime settings, with defaults of left enabled and right disabled.
+- Added `jiraPanelMaxItemsPerPage` to runtime settings with a default of `4`, plus Jira panel paging controls.
+- Replaced visible Jira panel paging buttons with automatic page flipping and added `jiraPanelAutoPageFlipSeconds` with a default of `30`.
 - Restored Jira auth in the dev proxy after the TeamCity proxy update removed it.
 - Removed the remaining Jenkins placeholder naming in favor of TeamCity terminology.
 - Panel headers now show bold filter names with non-bold filter IDs in parentheses.

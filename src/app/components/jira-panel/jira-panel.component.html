@@ -9,7 +9,7 @@
     <div class="empty" [hidden]="loading() || !!error() || issues().length > 0">
       No issues found.
     </div>
-    @for (issue of issues(); track issue.key) {
+    @for (issue of pagedIssues(); track issue.key) {
       <app-jira-item
         [issue]="issue"
         [autoScrollPixelsPerSecond]="descriptionAutoScrollPixelsPerSecond"

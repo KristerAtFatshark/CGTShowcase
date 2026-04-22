@@ -15,6 +15,8 @@ describe('JiraPanelComponent', () => {
     issues: JiraSearchResponse['issues'] = [],
     shouldError = false,
     showDescription = true,
+    maxItemsPerPage = 4,
+    autoPageFlipSeconds = 30,
   ): void {
     getFilterResultsSpy = vi.fn();
 
@@ -38,8 +40,14 @@ describe('JiraPanelComponent', () => {
     component.filterId = '18046';
     component.descriptionAutoScrollPixelsPerSecond = 12.5;
     component.showDescription = showDescription;
+    component.maxItemsPerPage = maxItemsPerPage;
+    component.autoPageFlipSeconds = autoPageFlipSeconds;
     fixture.detectChanges();
   }
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
   it('should create and load issues', () => {
     setup();
@@ -74,6 +82,148 @@ describe('JiraPanelComponent', () => {
     expect(component.issues().length).toBe(1);
     const items = fixture.nativeElement.querySelectorAll('app-jira-item');
     expect(items.length).toBe(1);
+  });
+
+  it('should paginate issues based on maxItemsPerPage', () => {
+    setup(
+      [
+        {
+          key: 'TEST-1',
+          fields: {
+            summary: 'Issue 1',
+            description: 'Desc',
+            status: { name: 'Open' },
+            issuetype: { name: 'Bug', iconUrl: 'https://example.com/bug.svg' },
+            duedate: null,
+          },
+        },
+        {
+          key: 'TEST-2',
+          fields: {
+            summary: 'Issue 2',
+            description: 'Desc',
+            status: { name: 'Open' },
+            issuetype: { name: 'Bug', iconUrl: 'https://example.com/bug.svg' },
+            duedate: null,
+          },
+        },
+        {
+          key: 'TEST-3',
+          fields: {
+            summary: 'Issue 3',
+            description: 'Desc',
+            status: { name: 'Open' },
+            issuetype: { name: 'Bug', iconUrl: 'https://example.com/bug.svg' },
+            duedate: null,
+          },
+        },
+        {
+          key: 'TEST-4',
+          fields: {
+            summary: 'Issue 4',
+            description: 'Desc',
+            status: { name: 'Open' },
+            issuetype: { name: 'Bug', iconUrl: 'https://example.com/bug.svg' },
+            duedate: null,
+          },
+        },
+        {
+          key: 'TEST-5',
+          fields: {
+            summary: 'Issue 5',
+            description: 'Desc',
+            status: { name: 'Open' },
+            issuetype: { name: 'Bug', iconUrl: 'https://example.com/bug.svg' },
+            duedate: null,
+          },
+        },
+      ],
+      false,
+      true,
+      4,
+      30,
+    );
+
+    expect(component.pagedIssues().length).toBe(4);
+    expect(component.totalPages()).toBe(2);
+    expect(component.currentPage()).toBe(0);
+  });
+
+  it('should automatically flip pages when there is more than one page', () => {
+    vi.useFakeTimers();
+
+    setup(
+      [
+        {
+          key: 'TEST-1',
+          fields: {
+            summary: 'Issue 1',
+            description: 'Desc',
+            status: { name: 'Open' },
+            issuetype: { name: 'Bug', iconUrl: 'https://example.com/bug.svg' },
+            duedate: null,
+          },
+        },
+        {
+          key: 'TEST-2',
+          fields: {
+            summary: 'Issue 2',
+            description: 'Desc',
+            status: { name: 'Open' },
+            issuetype: { name: 'Bug', iconUrl: 'https://example.com/bug.svg' },
+            duedate: null,
+          },
+        },
+        {
+          key: 'TEST-3',
+          fields: {
+            summary: 'Issue 3',
+            description: 'Desc',
+            status: { name: 'Open' },
+            issuetype: { name: 'Bug', iconUrl: 'https://example.com/bug.svg' },
+            duedate: null,
+          },
+        },
+        {
+          key: 'TEST-4',
+          fields: {
+            summary: 'Issue 4',
+            description: 'Desc',
+            status: { name: 'Open' },
+            issuetype: { name: 'Bug', iconUrl: 'https://example.com/bug.svg' },
+            duedate: null,
+          },
+        },
+        {
+          key: 'TEST-5',
+          fields: {
+            summary: 'Issue 5',
+            description: 'Desc',
+            status: { name: 'Open' },
+            issuetype: { name: 'Bug', iconUrl: 'https://example.com/bug.svg' },
+            duedate: null,
+          },
+        },
+      ],
+      false,
+      true,
+      4,
+      30,
+    );
+
+    expect(component.currentPage()).toBe(0);
+    expect(component.pagedIssues()[0].key).toBe('TEST-1');
+
+    vi.advanceTimersByTime(30000);
+    fixture.detectChanges();
+
+    expect(component.currentPage()).toBe(1);
+    expect(component.pagedIssues()[0].key).toBe('TEST-5');
+
+    vi.advanceTimersByTime(30000);
+    fixture.detectChanges();
+
+    expect(component.currentPage()).toBe(0);
   });
 
   it('should keep configured auto scroll speed', () => {

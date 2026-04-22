@@ -4,6 +4,8 @@ export interface UserSettings {
   rightPanelFilterId: string;
   leftPanelShowDescription: boolean;
   rightPanelShowDescription: boolean;
+  jiraPanelMaxItemsPerPage: number;
+  jiraPanelAutoPageFlipSeconds: number;
   descriptionAutoScrollPixelsPerSecond: number;
   textSizeMultiplier: number;
   leftPanelWidth: string;

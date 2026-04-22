@@ -44,6 +44,8 @@
           [filterId]="settings()!.leftPanelFilterId"
           [descriptionAutoScrollPixelsPerSecond]="settings()!.descriptionAutoScrollPixelsPerSecond"
           [showDescription]="settings()!.leftPanelShowDescription"
+          [maxItemsPerPage]="settings()!.jiraPanelMaxItemsPerPage"
+          [autoPageFlipSeconds]="settings()!.jiraPanelAutoPageFlipSeconds"
           (initialLoadResolved)="onInitialPanelLoadResolved($event)"
         ></app-jira-panel>
       </div>
@@ -53,6 +55,8 @@
           [filterId]="settings()!.rightPanelFilterId"
           [descriptionAutoScrollPixelsPerSecond]="settings()!.descriptionAutoScrollPixelsPerSecond"
           [showDescription]="settings()!.rightPanelShowDescription"
+          [maxItemsPerPage]="settings()!.jiraPanelMaxItemsPerPage"
+          [autoPageFlipSeconds]="settings()!.jiraPanelAutoPageFlipSeconds"
           (initialLoadResolved)="onInitialPanelLoadResolved($event)"
         ></app-jira-panel>
       </div>

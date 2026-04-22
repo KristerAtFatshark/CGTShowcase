@@ -18,6 +18,8 @@ describe('App', () => {
     rightPanelFilterId: '18047',
     leftPanelShowDescription: true,
     rightPanelShowDescription: false,
+    jiraPanelMaxItemsPerPage: 4,
+    jiraPanelAutoPageFlipSeconds: 30,
     descriptionAutoScrollPixelsPerSecond: 12.5,
     textSizeMultiplier: 1.25,
     leftPanelWidth: '45%',
@@ -151,6 +153,18 @@ describe('App', () => {
     const component = fixture.componentInstance;
     expect(component.settings()?.leftPanelShowDescription).toBe(true);
     expect(component.settings()?.rightPanelShowDescription).toBe(false);
+  });
+
+  it('should bind panel max items per page from settings', () => {
+    const fixture = setup();
+    const component = fixture.componentInstance;
+    expect(component.settings()?.jiraPanelMaxItemsPerPage).toBe(4);
+  });
+
+  it('should bind panel auto page flip seconds from settings', () => {
+    const fixture = setup();
+    const component = fixture.componentInstance;
+    expect(component.settings()?.jiraPanelAutoPageFlipSeconds).toBe(30);
   });
 
   it('should show startup jira errors under loading text', () => {

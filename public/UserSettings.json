@@ -1,9 +1,11 @@
 {
   "showDebugBar": true,
-  "leftPanelFilterId": "18046",
-  "rightPanelFilterId": "18048",
+  "leftPanelFilterId": "22787",
+  "rightPanelFilterId": "22788",
   "leftPanelShowDescription": true,
   "rightPanelShowDescription": false,
+  "jiraPanelMaxItemsPerPage": 4,
+  "jiraPanelAutoPageFlipSeconds": 30,
   "descriptionAutoScrollPixelsPerSecond": 10,
   "textSizeMultiplier": 1,
   "leftPanelWidth": "50%",
