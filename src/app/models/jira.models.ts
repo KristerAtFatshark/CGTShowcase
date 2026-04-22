@@ -12,6 +12,9 @@ export interface JiraIssue {
       name: string;
       iconUrl?: string;
     };
+    assignee?: {
+      displayName: string;
+    } | null;
     duedate: string | null;
   };
 }

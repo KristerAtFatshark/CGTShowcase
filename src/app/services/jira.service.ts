@@ -18,7 +18,7 @@ export class JiraService {
     return this.http.get<JiraFilterResponse>(`/jira-api/filter/${filterId}`).pipe(
       switchMap((filterResponse) => {
         const jql = encodeURIComponent(filterResponse.jql);
-        let url = `/jira-api/search/jql?jql=${jql}&maxResults=${maxResults}&fields=summary,status,issuetype,priority,description,duedate`;
+        let url = `/jira-api/search/jql?jql=${jql}&maxResults=${maxResults}&fields=summary,status,issuetype,priority,assignee,description,duedate`;
         if (nextPageToken) {
           url += `&nextPageToken=${encodeURIComponent(nextPageToken)}`;
         }

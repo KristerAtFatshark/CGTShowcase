@@ -45,6 +45,9 @@ describe('JiraItemComponent', () => {
         name: 'Highest',
         iconUrl: 'https://example.com/highest.svg',
       },
+      assignee: {
+        displayName: 'Jane Doe',
+      },
       duedate: '2026-06-15',
     },
   };
@@ -74,6 +77,11 @@ describe('JiraItemComponent', () => {
   it('should display the issue key', () => {
     const el = fixture.nativeElement.querySelector('.key');
     expect(el.textContent).toContain('TEST-42');
+  });
+
+  it('should display the assignee', () => {
+    const el = fixture.nativeElement.querySelector('.assignee');
+    expect(el.textContent).toContain('Jane Doe');
   });
 
   it('should display the status', () => {
@@ -136,6 +144,17 @@ describe('JiraItemComponent', () => {
     fix.detectChanges();
     const el = fix.nativeElement.querySelector('.description-box');
     expect(el.textContent).toContain('Summary / Goal section is missing from this ticket');
+  });
+
+  it('should show unassigned when jira assignee is missing', () => {
+    const fix = TestBed.createComponent(JiraItemComponent);
+    fix.componentInstance.issue = {
+      ...mockIssue,
+      fields: { ...mockIssue.fields, assignee: null },
+    };
+    fix.detectChanges();
+
+    expect(fix.nativeElement.querySelector('.assignee').textContent).toContain('Unassigned');
   });
 
   it('should show fallback text when Summary / Goal section is missing', () => {

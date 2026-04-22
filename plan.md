@@ -2,9 +2,9 @@
 
 ## Overview
 
-CGTShowcase is an Angular 21 standalone TypeScript application intended for Windows TV/browser display use. It loads Jira issues from two configured Jira filters, renders them in two scrollable columns, and shows TeamCity build status cards in the bottom bar.
+CGTShowcase is an Angular 21 standalone TypeScript application intended for Windows TV/browser display use. It loads Jira issues from two configured Jira filters, renders them in two side-by-side panels, and shows TeamCity build status cards in the bottom bar.
 
-This document reflects the current implemented solution.
+This document reflects the current implemented application.
 
 ## Current Stack
 
@@ -24,7 +24,7 @@ This document reflects the current implemented solution.
 - Local helper: `stop-server.bat`
 - Jira, TeamCity, and app-local file access all go through `proxy.conf.js`
 - `proxy.conf.js` uses separate per-route auth handling for Jira and TeamCity
-- `proxy.conf.js` also exposes a small local `/app-api/*` path for reading the distributed latest main file during dev
+- `proxy.conf.js` also exposes a local `/app-api/*` path for reading the distributed latest main file during dev
 
 ### Production
 
@@ -72,6 +72,7 @@ CGTShowcase/
 │   │   │   ├── teamcity.models.ts
 │   │   │   └── user-settings.model.ts
 │   │   ├── services/
+│   │   │   ├── browser-settings.service.ts
 │   │   │   ├── distributed-latest-main.service.ts
 │   │   │   ├── jira.service.ts
 │   │   │   ├── settings.service.ts
@@ -104,8 +105,12 @@ Current shape:
 ```json
 {
   "showDebugBar": true,
-  "leftPanelFilterId": "18046",
-  "rightPanelFilterId": "18048",
+  "leftPanelFilterId": "22787",
+  "rightPanelFilterId": "22788",
+  "leftPanelShowDescription": true,
+  "rightPanelShowDescription": false,
+  "jiraPanelMaxItemsPerPage": 4,
+  "jiraPanelAutoPageFlipSeconds": 30,
   "descriptionAutoScrollPixelsPerSecond": 10,
   "textSizeMultiplier": 1,
   "leftPanelWidth": "50%",
@@ -120,12 +125,34 @@ Fields:
 - `showDebugBar`: show or hide the top debug bar
 - `leftPanelFilterId`: Jira filter for the left panel
 - `rightPanelFilterId`: Jira filter for the right panel
+- `leftPanelShowDescription`: show or hide Jira card descriptions in the left panel
+- `rightPanelShowDescription`: show or hide Jira card descriptions in the right panel
+- `jiraPanelMaxItemsPerPage`: maximum Jira items shown per page
+- `jiraPanelAutoPageFlipSeconds`: automatic page flip interval for Jira panels
 - `descriptionAutoScrollPixelsPerSecond`: description scroll speed in pixels per second
 - `textSizeMultiplier`: multiplies UI text sizes globally
 - `leftPanelWidth`: CSS width value for the left Jira panel
 - `bottomBarHeight`: CSS height value for the bottom bar
 - `distributedLatestMain`: network path to the latest distributed main build info file
 - `teamCityBuildTypeIds`: TeamCity build type IDs to show in the bottom bar
+
+## Browser-Local Debug Settings
+
+The debug bar supports browser-specific overrides stored in a cookie. These override server settings only for the current browser.
+
+Cookie-backed overrideable settings:
+
+- `showDebugBar`
+- `textSizeMultiplier`
+- `leftPanelWidth`
+- `bottomBarHeight`
+- `descriptionAutoScrollPixelsPerSecond`
+
+Behavior:
+
+- If a browser cookie override exists, it wins for that browser
+- If not, the app uses the server-provided `UserSettings.json` value
+- A hidden 32x21 top-right reveal button can restore the debug bar by setting the browser-local `showDebugBar` override back to `true`
 
 ## Current Implemented Features
 
@@ -149,6 +176,7 @@ Requested Jira fields:
 - `status`
 - `issuetype`
 - `priority`
+- `assignee`
 - `description`
 - `duedate`
 
@@ -157,32 +185,37 @@ Used Jira data in the UI:
 - filter name
 - issue type icon
 - issue key
+- assignee display name
 - priority icon and text
 - status
 - summary
-- description
+- `Summary / Goal` description text
 
 ### Two Jira Panels
 
 - Left and right panels use separate filter IDs from `UserSettings.json`
 - Each panel loads independently
 - Left panel width is runtime-configurable
+- Description visibility is configurable separately for left and right panels
+- Panels page their issue lists using the configured maximum items per page
+- Panels automatically flip pages on a timer instead of showing visible paging buttons
 
 ### Automatic Initial Load
 
 - On startup:
   1. load `UserSettings.json`
-  2. render the app layout
-  3. each panel loads Jira data automatically
-  4. TeamCity build cards load automatically
-  5. the distributed latest main file is read and matched against TeamCity if configured
+  2. load browser-local debug setting overrides
+  3. render the app layout
+  4. each panel loads Jira data automatically
+  5. TeamCity build cards load automatically
+  6. the distributed latest main file is read and matched against TeamCity if configured
 
-### Refresh Button
+### Refresh Behavior
 
 - Implemented in the top bar
-- Reloads both Jira panels
-- Reloads the full TeamCity bottom-bar flow
-- Also reruns the distributed latest main file read and TeamCity revision match
+- Manual refresh button reloads both Jira panels and the full TeamCity bottom-bar flow
+- Automatic refresh runs the same full refresh flow every 5 minutes
+- Refresh also reruns the distributed latest main file read and TeamCity revision match
 
 ### TeamCity Build Status
 
@@ -224,17 +257,21 @@ Important note:
 ### Top Bar
 
 - Optional via `showDebugBar`
-- Contains debug label and refresh button
+- Contains debug label, browser-local setting controls, and refresh button
 
 ### Left Panel
 
-- Scrollable list of Jira issues from the left filter
+- Scrollable Jira issue list from the left filter
 - Width controlled by `leftPanelWidth`
+- Description visibility controlled by `leftPanelShowDescription`
+- Uses automatic page flipping when more than one page exists
 
 ### Right Panel
 
-- Scrollable list of Jira issues from the right filter
+- Scrollable Jira issue list from the right filter
 - Fills the remaining horizontal space
+- Description visibility controlled by `rightPanelShowDescription`
+- Uses automatic page flipping when more than one page exists
 
 ### Bottom Bar
 
@@ -256,12 +293,13 @@ My Filter (18046)
 
 ## Current Jira Item Layout
 
-Each Jira item has 3 visual sections:
+Each Jira item has up to 3 visual sections:
 
 ### Row 1
 
 - issue type icon
 - issue key
+- assignee
 - priority icon and priority text
 - status
 
@@ -272,6 +310,14 @@ Each Jira item has 3 visual sections:
 ### Row 3
 
 - vertically scrolling description area
+- this row is hidden when the panel’s description visibility setting is disabled
+
+## Jira Description Behavior
+
+- Jira ticket cards show only the `Summary / Goal` section from the Jira description field
+- If the Jira ticket does not contain a `Summary / Goal` section, the card shows:
+  - `Summary / Goal section is missing from this ticket`
+- Unsupported or unreadable Jira description nodes are fully removed from the rendered text, including blank lines they would otherwise leave behind
 
 ## Current TeamCity Build Item Layout
 
@@ -290,6 +336,13 @@ Each TeamCity build item has 2 visual sections:
 - finished time in Swedish local time with `SWE` suffix
 - `branchName`
 
+## Current Jira Panel Paging Behavior
+
+- Each panel shows up to `jiraPanelMaxItemsPerPage` items at once
+- If a panel has more than one page, it automatically flips pages every `jiraPanelAutoPageFlipSeconds`
+- The page index wraps back to the first page after the last one
+- There are no visible paging buttons
+
 ## Current Description Auto-Scroll Behavior
 
 Descriptions currently:
@@ -303,7 +356,7 @@ Descriptions currently:
 
 ## Current Text Scaling Behavior
 
-Text scaling is driven by `textSizeMultiplier` in `UserSettings.json`.
+Text scaling is driven by `textSizeMultiplier` in `UserSettings.json` or the browser-local debug override cookie.
 
 This multiplier is applied through a shared CSS variable and affects visible text in:
 
@@ -356,7 +409,8 @@ provideZonelessChangeDetection();
 
 Signals are used for key runtime state, including:
 
-- loaded and settings state
+- loaded and effective settings state
+- browser-local override state
 - startup error aggregation
 - Jira panel loading and issue state
 - TeamCity build state
@@ -398,6 +452,7 @@ The test suite currently covers:
 
 - app startup and error overlay behavior
 - settings service
+- browser settings service
 - distributed latest main service
 - Jira service
 - TeamCity service
@@ -406,6 +461,7 @@ The test suite currently covers:
 - Jira item
 - bottom bar
 - refresh-button TeamCity reload behavior
+- automatic Jira page flipping behavior
 
 Current verified state:
 
@@ -417,11 +473,15 @@ Current verified state:
 The current application includes:
 
 - runtime-editable user settings
+- browser-local debug setting overrides via cookie
 - two Jira-backed issue panels
 - configurable left panel width and bottom bar height
+- configurable per-panel description visibility
+- configurable Jira page size and auto page-flip timing
 - Jira filter names in panel headers
-- Jira issue type and priority icons in item headers
-- configurable text scaling via user settings
+- Jira issue type, assignee, and priority data in item headers
+- Jira `Summary / Goal` extraction with fallback text
+- configurable text scaling via settings and browser-local overrides
 - configurable description auto-scroll speed
 - TeamCity build status integration in the bottom bar
 - TeamCity `main` branch build filtering

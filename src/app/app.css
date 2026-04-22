@@ -11,14 +11,40 @@
   width: 32px;
   height: 21px;
   padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid transparent;
   background: transparent;
   cursor: pointer;
   z-index: 20;
+  overflow: hidden;
+  transition:
+    width 0.15s ease,
+    padding 0.15s ease,
+    border-color 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .debug-bar-reveal-button:hover {
+  width: auto;
+  padding: 0 8px;
   border-color: #ff9800;
+  background-color: rgba(26, 26, 26, 0.95);
+}
+
+.debug-bar-reveal-button-text {
+  opacity: 0;
+  color: #ffb74d;
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.debug-bar-reveal-button:hover .debug-bar-reveal-button-text {
+  opacity: 1;
 }
 
 .loading-screen,

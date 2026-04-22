@@ -7,6 +7,7 @@
       [title]="issueTypeName"
     />
     <span class="key">{{ issue.key }}</span>
+    <span class="assignee">{{ assigneeName }}</span>
     <span class="priority" [title]="priorityName">
       @if (priorityIconUrl) {
         <img class="priority-icon" [src]="priorityIconUrl" [alt]="priorityName" />

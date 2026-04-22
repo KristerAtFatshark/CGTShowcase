@@ -65,6 +65,71 @@ describe('JiraPanelComponent', () => {
     expect(filterId.textContent).toContain('(18046)');
   });
 
+  it('should show current page indicator when there is more than one page', () => {
+    setup(
+      [
+        {
+          key: 'TEST-1',
+          fields: {
+            summary: 'Issue 1',
+            description: 'Desc',
+            status: { name: 'Open' },
+            issuetype: { name: 'Bug', iconUrl: 'https://example.com/bug.svg' },
+            duedate: null,
+          },
+        },
+        {
+          key: 'TEST-2',
+          fields: {
+            summary: 'Issue 2',
+            description: 'Desc',
+            status: { name: 'Open' },
+            issuetype: { name: 'Bug', iconUrl: 'https://example.com/bug.svg' },
+            duedate: null,
+          },
+        },
+        {
+          key: 'TEST-3',
+          fields: {
+            summary: 'Issue 3',
+            description: 'Desc',
+            status: { name: 'Open' },
+            issuetype: { name: 'Bug', iconUrl: 'https://example.com/bug.svg' },
+            duedate: null,
+          },
+        },
+        {
+          key: 'TEST-4',
+          fields: {
+            summary: 'Issue 4',
+            description: 'Desc',
+            status: { name: 'Open' },
+            issuetype: { name: 'Bug', iconUrl: 'https://example.com/bug.svg' },
+            duedate: null,
+          },
+        },
+        {
+          key: 'TEST-5',
+          fields: {
+            summary: 'Issue 5',
+            description: 'Desc',
+            status: { name: 'Open' },
+            issuetype: { name: 'Bug', iconUrl: 'https://example.com/bug.svg' },
+            duedate: null,
+          },
+        },
+      ],
+      false,
+      true,
+      4,
+      30,
+    );
+
+    const indicator = fixture.nativeElement.querySelector('.panel-page-indicator');
+    expect(indicator).toBeTruthy();
+    expect(indicator.textContent).toContain('Page 1 / 2');
+  });
+
   it('should display issues after loading', () => {
     setup([
       {

@@ -1,5 +1,5 @@
 {
-  "showDebugBar": true,
+  "showDebugBar": false,
   "leftPanelFilterId": "22787",
   "rightPanelFilterId": "22788",
   "leftPanelShowDescription": true,
