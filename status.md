@@ -80,6 +80,7 @@
 ## Recent Changes
 
 - Added `AGENTS.md` workflow rule file.
+- Expanded `AGENTS.md` with explicit testing expectations for features, bug fixes, settings, UI behavior, service changes, timer/refresh/paging/auto-scroll logic, and running tests after every build.
 - Added this `status.md` operational status file.
 - Moved text size scaling into `UserSettings.json` and removed the debug-bar control.
 - Updated `plan.md` to reflect the current application state and runtime model.
